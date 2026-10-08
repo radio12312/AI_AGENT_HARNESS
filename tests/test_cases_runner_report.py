@@ -40,6 +40,17 @@ def test_reference_cost():
     assert reference_cost(1_000_000, 1_000_000, {"input_per_1m_usd": 0.5, "output_per_1m_usd": 2.2}) == 2.7
 
 
+def test_resume_keeps_completed_and_requeues_infra(tmp_path):
+    from harness.runner import load_for_resume
+    rows = [{"case_id": "a", "trial": 1, "infra_error": False, "pass": True},
+            {"case_id": "b", "trial": 1, "infra_error": True, "pass": None}]
+    (tmp_path / "runs.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+    kept, infra = load_for_resume(tmp_path)
+    assert [r["case_id"] for r in kept] == ["a"] and [r["case_id"] for r in infra] == ["b"]
+    assert len((tmp_path / "runs.jsonl").read_text().strip().splitlines()) == 1
+    assert "\"b\"" in (tmp_path / "infra_attempts.jsonl").read_text()
+
+
 def test_runner_and_report_end_to_end(tmp_path):
     cases = [c for c in load_cases("cases/*.yaml") if c["id"] in ("happy_03_simple_refund", "policy_02_duplicate_refund")]
     by_id = {c["id"]: c for c in cases}

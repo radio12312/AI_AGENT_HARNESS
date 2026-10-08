@@ -12,7 +12,7 @@ from pathlib import Path
 from harness.cases import load_cases
 from harness.config import api_key, load_config, resolve
 from harness.llm import LLMClient
-from harness.runner import run_eval
+from harness.runner import load_for_resume, run_eval
 
 
 def main(argv=None) -> int:
@@ -26,14 +26,31 @@ def main(argv=None) -> int:
     ap.add_argument("--config", default=None, help="path to config.yaml")
     ap.add_argument("--out", default=None, help="results directory (default results/<timestamp>)")
     ap.add_argument("--label", default="", help="free-text label stored in meta.json (e.g. 'baseline')")
+    ap.add_argument("--resume", default=None, metavar="DIR",
+                    help="continue an interrupted run: keep its completed runs, re-run missing and infra_error ones")
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config, {"model": args.model, "tool_mode": args.tool_mode,
                                     "concurrency": args.concurrency, "max_steps": args.max_steps,
                                     "cases": args.cases})
     cases = load_cases(cfg["cases"])
-    out_dir = Path(args.out) if args.out else resolve(cfg.get("results_dir", "results")) / time.strftime("%Y%m%d-%H%M%S")
+    if args.resume:
+        out_dir = resolve(args.resume)
+    elif args.out:
+        out_dir = Path(args.out)
+    else:
+        out_dir = resolve(cfg.get("results_dir", "results")) / time.strftime("%Y%m%d-%H%M%S")
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    done: set = set()
+    prior_meta = {}
+    if args.resume:
+        kept, infra = load_for_resume(out_dir)
+        ids = {c["id"] for c in cases}
+        done = {(r["case_id"], r["trial"]) for r in kept if r["case_id"] in ids}
+        if (out_dir / "meta.json").exists():
+            prior_meta = json.loads((out_dir / "meta.json").read_text(encoding="utf-8"))
+        print(f"resuming {out_dir}: keeping {len(done)} completed runs, re-running {len(infra)} infra_error runs + missing")
 
     meta = {
         "label": args.label, "model": cfg["model"], "tool_mode": cfg.get("tool_mode"),
@@ -42,15 +59,21 @@ def main(argv=None) -> int:
         "pricing": cfg.get("pricing"), "started": time.strftime("%Y-%m-%d %H:%M:%S"),
         "git_commit": _git_commit(), "python": platform.python_version(),
     }
+    if prior_meta:
+        meta["label"] = meta["label"] or prior_meta.get("label", "")
+        meta["started"] = prior_meta.get("started", meta["started"])
+        meta["resumed"] = prior_meta.get("resumed", []) + [time.strftime("%Y-%m-%d %H:%M:%S")]
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
     print(f"model={cfg['model']} tool_mode={cfg.get('tool_mode')} cases={len(cases)} trials={args.trials} "
           f"concurrency={cfg.get('concurrency')} -> {out_dir}")
     llm = LLMClient(cfg, api_key(cfg))
-    records = run_eval(cases, cfg, llm, out_dir, args.trials, int(cfg.get("concurrency", 2)))
+    run_eval(cases, cfg, llm, out_dir, args.trials, int(cfg.get("concurrency", 2)), done=done)
 
     meta["finished"] = time.strftime("%Y-%m-%d %H:%M:%S")
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    with open(out_dir / "runs.jsonl", encoding="utf-8") as f:
+        records = [json.loads(line) for line in f if line.strip()]
     valid = [r for r in records if not r["infra_error"]]
     passes = sum(1 for r in valid if r["pass"])
     print(f"pass {passes}/{len(valid)} valid runs; infra_error {len(records) - len(valid)}. "

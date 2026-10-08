@@ -21,11 +21,11 @@ max_steps: 10           # LLM calls per run; a case's expected.max_steps overrid
 
 # --- Runner ----------------------------------------------------------------
 concurrency: 2
-rate_limit_rpm: 35      # client-side request pacing shared across workers (0 = off)
+rate_limit_rpm: 20      # client-side request pacing shared across workers (0 = off)
 retry:
-  max_retries: 6        # on 429 / 5xx / connection errors; never counted as agent steps
+  max_retries: 10       # on 429 / 5xx / connection errors; never counted as agent steps
   base_delay_s: 2.0
-  max_delay_s: 60.0
+  max_delay_s: 90.0
 
 fixture: fixtures/db.json
 cases: cases/*.yaml

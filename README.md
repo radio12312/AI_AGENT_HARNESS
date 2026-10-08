@@ -59,7 +59,7 @@ python -m pytest -q
 
 ```text
 python run_eval.py [--trials N=5] [--cases GLOB[,GLOB...]] [--concurrency N=2] [--model ID]
-                   [--tool-mode native|json] [--max-steps N] [--out DIR] [--label TEXT]
+                   [--tool-mode native|json] [--max-steps N] [--out DIR] [--label TEXT] [--resume DIR]
 python report.py   [--run-dir DIR] [--update-readme] [--compare BEFORE_DIR AFTER_DIR]
 ```
 

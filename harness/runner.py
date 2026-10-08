@@ -74,15 +74,40 @@ def run_one(case: dict, trial: int, cfg: dict, llm: LLMClient, out_dir: Path, ju
     }
 
 
+def load_for_resume(out_dir: Path) -> tuple[list[dict], list[dict]]:
+    """Split an interrupted run's records into (kept, infra_attempts).
+
+    Completed non-infra runs are kept; infra_error runs are moved to
+    infra_attempts.jsonl (still reported) and re-run.
+    """
+    path = out_dir / "runs.jsonl"
+    if not path.exists():
+        return [], []
+    with open(path, encoding="utf-8") as f:
+        records = [json.loads(line) for line in f if line.strip()]
+    kept = [r for r in records if not r["infra_error"]]
+    infra = [r for r in records if r["infra_error"]]
+    if infra:
+        with open(out_dir / "infra_attempts.jsonl", "a", encoding="utf-8") as f:
+            for r in infra:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    with open(path, "w", encoding="utf-8") as f:
+        for r in kept:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    return kept, infra
+
+
 def run_eval(cases: list[dict], cfg: dict, llm: LLMClient, out_dir: Path, trials: int,
-             concurrency: int, log=print) -> list[dict]:
+             concurrency: int, log=print, done: set | None = None) -> list[dict]:
+    """Run every (case, trial) not in `done`; appends to runs.jsonl when resuming."""
     out_dir.mkdir(parents=True, exist_ok=True)
-    jobs = [(c, t) for t in range(1, trials + 1) for c in cases]
+    done = done or set()
+    jobs = [(c, t) for t in range(1, trials + 1) for c in cases if (c["id"], t) not in done]
     judge = make_judge(llm) if any(c.get("judge") for c in cases) else None
     lock = threading.Lock()
     records: list[dict] = []
     started = time.time()
-    with open(out_dir / "runs.jsonl", "w", encoding="utf-8") as jsonl, \
+    with open(out_dir / "runs.jsonl", "a" if done else "w", encoding="utf-8") as jsonl, \
             ThreadPoolExecutor(max_workers=max(1, concurrency)) as pool:
         futures = {pool.submit(run_one, c, t, cfg, llm, out_dir, judge): (c, t) for c, t in jobs}
         for fut in as_completed(futures):

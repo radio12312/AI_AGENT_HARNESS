@@ -192,6 +192,11 @@ def build_report(run_dir: Path) -> str:
     s = summarize(runs)
     pricing = meta.get("pricing") or load_config().get("pricing", {})
     infra_runs = [f"{r['case_id']} t{r['trial']}: {_clip(r.get('error'), 120)}" for r in runs if r["infra_error"]]
+    retried = run_dir / "infra_attempts.jsonl"
+    if retried.exists():
+        attempts = [json.loads(line) for line in retried.read_text(encoding="utf-8").splitlines() if line.strip()]
+        infra_runs.append(f"{len(attempts)} earlier attempt(s) ended in infra_error and were re-run on resume "
+                          f"(see infra_attempts.jsonl): " + ", ".join(f"{r['case_id']} t{r['trial']}" for r in attempts))
     trials = meta.get("trials", "?")
     sections = [
         f"# Eval report - {run_dir.name}",
