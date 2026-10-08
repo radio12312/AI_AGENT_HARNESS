@@ -32,7 +32,7 @@ def api_key(cfg: dict) -> str:
     if not key:
         raise SystemExit(
             f"{cfg.get('api_key_env', 'NVIDIA_API_KEY')} is not set. "
-            "Copy .env.example to .env and add your key."
+            "Create a .env file containing: NVIDIA_API_KEY=nvapi-..."
         )
     return key
 

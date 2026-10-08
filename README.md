@@ -37,7 +37,7 @@ score interval.
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env        # then put your NVIDIA_API_KEY in .env
+echo NVIDIA_API_KEY=nvapi-your-key > .env   # key from build.nvidia.com; .env is gitignored
 make check                  # one plain chat call + one tool-calling call
 make smoke                  # 1 trial x 3 cases
 make eval                   # all cases x 5 trials
