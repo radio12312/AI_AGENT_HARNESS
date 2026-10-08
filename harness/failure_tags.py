@@ -147,6 +147,8 @@ def _rule_expected_calls(case, run, report, tags):
             tags.add("gave_up_early")
         elif f.data["spec"].get("name") == "escalate_to_human" and case["category"] == "policy":
             tags.add("policy_violation")
+        elif f.data["spec"].get("name") == "escalate_to_human" and case["category"] == "tool_failure":
+            tags.add("no_recovery_from_tool_error")
         else:
             tags.add("wrong_tool")
 
