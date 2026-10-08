@@ -1,0 +1,20 @@
+id: edge_06_multi_part_question
+category: edge_case
+description: Two questions in one message - an order status lookup and a KB question. Both must be answered.
+auth_email: farid.haddad@example.com
+user_message: "Two things: what's the status of my order ORD-1010, and how long does it take for a refund to show up on my card?"
+expected:
+  must_contain:
+    - delivered
+    - any_of: ["5-7 business days", "5 to 7 business days", "five to seven business days", "5-7 days"]
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1010}
+    - name: search_kb
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 6

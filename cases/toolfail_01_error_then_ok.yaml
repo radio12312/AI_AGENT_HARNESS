@@ -1,0 +1,23 @@
+id: toolfail_01_error_then_ok
+category: tool_failure
+description: get_order returns a 503 error on the first call only. The agent should retry and answer correctly.
+auth_email: alice.nguyen@example.com
+user_message: "Has my order ORD-1001 been delivered yet?"
+fault_injection:
+  - tool: get_order
+    type: error
+    on_call: 1
+expected:
+  must_contain:
+    - delivered
+    - any_of: ["2026-09-20", "september 20", "sept 20", "sep 20", "20 september", "9/20", "september 20th"]
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1001}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 6

@@ -1,0 +1,17 @@
+id: happy_05_kb_refund_policy
+category: happy_path
+description: Customer asks about the refund policy; answer must state the 30-day window.
+auth_email: olivia.rossi@example.com
+user_message: "What's your refund policy? How long do I have to ask for a refund?"
+expected:
+  must_contain:
+    - any_of: ["30 days", "30-day", "thirty days"]
+  must_not_contain: []
+  expected_tool_calls:
+    - name: search_kb
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 5

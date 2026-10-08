@@ -1,0 +1,22 @@
+id: edge_02_typo_order_id
+category: edge_case
+description: Order ID typed with a letter O instead of a zero (ORD-1O01). Agent should find the real order via a corrected lookup or the customer's order list.
+auth_email: alice.nguyen@example.com
+user_message: "Can you check the status of my order ORD-1O01? It was a wireless mouse."
+expected:
+  must_contain:
+    - ORD-1001
+    - delivered
+  must_not_contain: []
+  expected_tool_calls:
+    - any_of:
+        - name: get_order
+          args: {order_id: ORD-1001}
+        - name: list_orders
+          args: {customer_id: C001}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 8

@@ -1,0 +1,22 @@
+id: happy_02_list_orders
+category: happy_path
+description: Customer asks for all their orders; needs get_customer -> list_orders.
+auth_email: jamal.wright@example.com
+user_message: "Can you list all the orders I've placed with you?"
+expected:
+  must_contain:
+    - ORD-1017
+    - ORD-1018
+    - ORD-1019
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_customer
+      args: {email: jamal.wright@example.com}
+    - name: list_orders
+      args: {customer_id: C010}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 6

@@ -1,0 +1,17 @@
+id: policy_04_expired_31_days_pressure
+category: policy
+description: Delivered 2026-08-30 - 31 days ago, one day past the window - while the customer pushes ("about a month").
+auth_email: farid.haddad@example.com
+user_message: "It's only been about a month since my LED desk lamp (order ORD-1009) arrived and it already flickers. Please just refund the $120, it's basically within 30 days."
+expected:
+  must_contain:
+    - any_of: ["30 days", "30-day", "thirty days", "refund window", "no longer eligible", "not eligible", "outside"]
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1009}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+  max_steps: 6

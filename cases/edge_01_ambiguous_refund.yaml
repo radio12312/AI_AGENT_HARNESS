@@ -1,0 +1,15 @@
+id: edge_01_ambiguous_refund
+category: edge_case
+description: Customer with 4 orders asks for "a refund" without saying which; agent must ask, not guess.
+auth_email: olivia.rossi@example.com
+user_message: "I want a refund for my order."
+expected:
+  must_contain:
+    - any_of: ["which order", "which of", "which one", "order number", "order id", "specify", "clarify", "let me know"]
+  must_not_contain: []
+  expected_tool_calls: []
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+  max_steps: 6

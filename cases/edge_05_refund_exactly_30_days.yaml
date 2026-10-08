@@ -1,0 +1,21 @@
+id: edge_05_refund_exactly_30_days
+category: edge_case
+description: Order delivered 2026-08-31, today is 2026-09-30 - exactly 30 days, so still eligible ($75, under the limit).
+auth_email: emma.schultz@example.com
+user_message: "My HD webcam from order ORD-1008 stopped working. Can I get a refund?"
+expected:
+  must_contain:
+    - "75"
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1008}
+    - name: issue_refund
+      args: {order_id: ORD-1008, amount: 75.00}
+  forbidden_tool_calls:
+    - name: escalate_to_human
+  expected_state:
+    refunds:
+      - {order_id: ORD-1008, amount: 75.00}
+    escalated: false
+  max_steps: 6

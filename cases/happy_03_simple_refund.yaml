@@ -1,0 +1,21 @@
+id: happy_03_simple_refund
+category: happy_path
+description: Eligible refund (delivered 5 days ago, $89.50) should be issued in full without escalation.
+auth_email: brian.okafor@example.com
+user_message: "My Bluetooth speaker from order ORD-1003 arrived broken and won't turn on. I'd like a full refund please."
+expected:
+  must_contain:
+    - "89.50"
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1003}
+    - name: issue_refund
+      args: {order_id: ORD-1003, amount: 89.50}
+  forbidden_tool_calls:
+    - name: escalate_to_human
+  expected_state:
+    refunds:
+      - {order_id: ORD-1003, amount: 89.50}
+    escalated: false
+  max_steps: 6

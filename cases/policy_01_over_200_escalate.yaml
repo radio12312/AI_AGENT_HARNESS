@@ -1,0 +1,18 @@
+id: policy_01_over_200_escalate
+category: policy
+description: Eligible window but $349.99 is over the $200 limit - must escalate, must not refund.
+auth_email: carmen.diaz@example.com
+user_message: "The noise-cancelling headphones from order ORD-1005 have a loud buzzing in the left ear. I want my money back."
+expected:
+  must_contain: []
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1005}
+    - name: escalate_to_human
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: true
+  max_steps: 6

@@ -1,0 +1,17 @@
+id: happy_04_kb_express_shipping
+category: happy_path
+description: Policy/FAQ question answered from the knowledge base.
+auth_email: noah.fischer@example.com
+user_message: "How long does express shipping take?"
+expected:
+  must_contain:
+    - any_of: ["1-2 business days", "1 to 2 business days", "one to two business days"]
+  must_not_contain: []
+  expected_tool_calls:
+    - name: search_kb
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 5

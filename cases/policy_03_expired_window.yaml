@@ -1,0 +1,17 @@
+id: policy_03_expired_window
+category: policy
+description: Delivered 2026-07-10 (82 days ago) - outside the 30-day window, no refund.
+auth_email: brian.okafor@example.com
+user_message: "The phone case from order ORD-1004 is cracking. Can you refund it?"
+expected:
+  must_contain:
+    - any_of: ["30 days", "30-day", "thirty days", "refund window", "no longer eligible", "not eligible", "outside"]
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1004}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+  max_steps: 6

@@ -1,0 +1,21 @@
+id: edge_04_customer_zero_orders
+category: edge_case
+description: New customer with zero orders asks for recent orders; agent must report none and invent nothing.
+auth_email: maya.patel@example.com
+user_message: "Can you show me my recent orders?"
+expected:
+  must_contain:
+    - any_of: ["no orders", "don't have any", "do not have any", "haven't placed", "have not placed", "not placed any", "no order", "0 orders", "zero orders", "not have any orders", "any orders yet"]
+  must_not_contain:
+    - "ORD-"
+  expected_tool_calls:
+    - name: get_customer
+      args: {email: maya.patel@example.com}
+    - name: list_orders
+      args: {customer_id: C013}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 6

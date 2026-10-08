@@ -1,0 +1,21 @@
+id: happy_07_partial_refund
+category: happy_path
+description: Refund only one line item ($12.99 cable) of a two-item order.
+auth_email: ingrid.svensson@example.com
+user_message: "The USB-C cable in order ORD-1016 is defective. Please refund just the cable, I'm keeping the SSD."
+expected:
+  must_contain:
+    - "12.99"
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1016}
+    - name: issue_refund
+      args: {order_id: ORD-1016, amount: 12.99}
+  forbidden_tool_calls:
+    - name: escalate_to_human
+  expected_state:
+    refunds:
+      - {order_id: ORD-1016, amount: 12.99}
+    escalated: false
+  max_steps: 6

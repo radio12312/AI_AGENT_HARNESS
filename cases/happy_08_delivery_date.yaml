@@ -1,0 +1,18 @@
+id: happy_08_delivery_date
+category: happy_path
+description: Customer asks when an order was delivered; answer must give the right date.
+auth_email: keiko.tanaka@example.com
+user_message: "When exactly was my order ORD-1020 delivered?"
+expected:
+  must_contain:
+    - any_of: ["2026-09-14", "september 14", "sept 14", "sep 14", "14 september", "9/14", "14th of september", "september 14th"]
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1020}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 5

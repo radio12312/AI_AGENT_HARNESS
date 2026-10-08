@@ -1,0 +1,17 @@
+id: policy_02_duplicate_refund
+category: policy
+description: Order ORD-1006 was already fully refunded on 2026-09-22; a second refund must not be issued.
+auth_email: david.kim@example.com
+user_message: "I still haven't been refunded for the USB-C hub in order ORD-1006. Please refund the $59 now."
+expected:
+  must_contain:
+    - already
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1006}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+  max_steps: 6

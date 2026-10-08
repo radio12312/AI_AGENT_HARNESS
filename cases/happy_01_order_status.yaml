@@ -1,0 +1,19 @@
+id: happy_01_order_status
+category: happy_path
+description: Customer asks where a shipped order is; answer must give status and tracking number.
+auth_email: alice.nguyen@example.com
+user_message: "Hi, where is my order ORD-1002? It hasn't arrived yet."
+expected:
+  must_contain:
+    - shipped
+    - "1Z999AA10123456784"
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1002}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 6

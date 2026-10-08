@@ -1,0 +1,19 @@
+id: happy_06_order_details
+category: happy_path
+description: Customer asks what was in an order and how much it cost.
+auth_email: hector.alvarez@example.com
+user_message: "What did I buy in order ORD-1013 and how much did I pay?"
+expected:
+  must_contain:
+    - charger
+    - "42"
+  must_not_contain: []
+  expected_tool_calls:
+    - name: get_order
+      args: {order_id: ORD-1013}
+  forbidden_tool_calls:
+    - name: issue_refund
+  expected_state:
+    refunds: []
+    escalated: false
+  max_steps: 5
