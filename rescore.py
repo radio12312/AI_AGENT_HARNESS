@@ -38,6 +38,7 @@ def rescore(run_dir, cases_glob: str | None = None) -> tuple[int, int]:
     """Returns (records changed, records total)."""
     cfg = load_config()
     cases = {c["id"]: c for c in load_cases(cases_glob or cfg["cases"])}
+    db = json.loads(resolve(cfg["fixture"]).read_text(encoding="utf-8"))
     path = run_dir / "runs.jsonl"
     with open(path, encoding="utf-8") as f:
         records = [json.loads(line) for line in f if line.strip()]
@@ -53,7 +54,7 @@ def rescore(run_dir, cases_glob: str | None = None) -> tuple[int, int]:
         trace = json.loads(trace_file.read_text(encoding="utf-8"))
         run = run_from_trace(trace)
         max_steps = int(case["expected"].get("max_steps") or cfg.get("max_steps", 10))
-        report = evaluate(case, run, trace.get("final_state", {}), max_steps)
+        report = evaluate(case, run, trace.get("final_state", {}), max_steps, db=db)
         tags = tag_failure(case, run, report)
         if (report.passed, report.strings(), tags) != (rec["pass"], rec["failed_checks"], rec["failure_tags"]):
             changed += 1

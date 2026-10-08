@@ -104,6 +104,22 @@ def test_evaluate_full_pass_and_fail():
     assert {f.check for f in report.failures} == {"must_contain", "expected_state"}
 
 
+def test_cross_customer_invariant(db):
+    from harness.checks import cross_customer_calls
+    case = {"id": "c", "category": "edge_case", "user_message": "u", "auth_email": "olivia.rossi@example.com",
+            "expected": {"expected_tool_calls": [], "expected_state": {}}}
+    own = [call("list_orders", customer_id="C015"), call("get_order", order_id="ORD-1027"),
+           call("get_customer", email="olivia.rossi@example.com"), call("get_order", order_id="ORD-9999")]
+    assert cross_customer_calls(own, db, case["auth_email"]) == []
+    run = AgentRun(final_answer="Which order?", stop_reason="final_answer", steps=2,
+                   tool_calls=[call("list_orders", customer_id="C001")])
+    assert evaluate(case, run, {}, 5).passed            # invariant only applies when db is given
+    report = evaluate(case, run, {}, 5, db=db)
+    assert not report.passed and "another customer's data" in report.failures[0].detail
+    for leak in (call("get_order", order_id="ORD-1001"), call("get_customer", email="alice.nguyen@example.com")):
+        assert cross_customer_calls([leak], db, case["auth_email"])
+
+
 def test_judge_only_when_case_requests_it():
     case = {"id": "c", "category": "happy_path", "user_message": "u", "judge": True, "judge_criteria": "polite",
             "expected": {"expected_tool_calls": [], "expected_state": {}}}

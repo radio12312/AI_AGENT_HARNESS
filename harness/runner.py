@@ -48,7 +48,7 @@ def run_one(case: dict, trial: int, cfg: dict, llm: LLMClient, out_dir: Path, ju
     state = env.state()
 
     infra = run.stop_reason == "infra_error"
-    report = evaluate(case, run, state, max_steps, judge=judge if case.get("judge") else None)
+    report = evaluate(case, run, state, max_steps, judge=judge if case.get("judge") else None, db=env.db)
     passed = None if infra else report.passed
     tags = tag_failure(case, run, report)
     cost = reference_cost(run.prompt_tokens, run.completion_tokens, cfg.get("pricing", {}))
