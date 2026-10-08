@@ -100,6 +100,16 @@ def test_bad_request_is_a_crash(db):
     assert run.stop_reason == "crash" and "BadRequestError" in run.error
 
 
+def test_fixes_are_opt_in_and_validated(db):
+    llm, api = fake_llm([completion(content="a"), completion(content="b")])
+    Agent(llm, "native").run(CASE, ToolEnv.from_db(db))
+    Agent(llm, "native", fixes=["tool_error_policy"]).run(CASE, ToolEnv.from_db(db))
+    assert "TOOL FAILURES" not in api.calls[0]["messages"][0]["content"]
+    assert "TOOL FAILURES" in api.calls[1]["messages"][0]["content"]
+    with pytest.raises(ValueError):
+        Agent(llm, "native", fixes=["make_it_work"])
+
+
 def test_backoff_grows_and_respects_cap_and_retry_after():
     assert backoff_delay(0, 2, 60) <= 2
     assert 30 <= backoff_delay(10, 2, 60) <= 60

@@ -43,7 +43,7 @@ def run_one(case: dict, trial: int, cfg: dict, llm: LLMClient, out_dir: Path, ju
     max_steps = int(case["expected"].get("max_steps") or cfg.get("max_steps", 10))
     env = ToolEnv.from_fixture(resolve(cfg["fixture"]), case.get("fault_injection"),
                                float(cfg.get("fault_timeout_s", 0)))   # reset: re-read from disk every run
-    agent = Agent(llm, tool_mode=cfg.get("tool_mode", "native"), max_steps=max_steps)
+    agent = Agent(llm, tool_mode=cfg.get("tool_mode", "native"), max_steps=max_steps, fixes=cfg.get("fixes") or ())
     run = agent.run(case, env, max_steps=max_steps)
     state = env.state()
 
@@ -70,7 +70,7 @@ def run_one(case: dict, trial: int, cfg: dict, llm: LLMClient, out_dir: Path, ju
         "cost_usd": round(cost, 8), "latency": round(run.wall_time_s, 3), "llm_latency": round(run.llm_latency_s, 3),
         "retries": run.retries, "stop_reason": run.stop_reason, "error": run.error,
         "trace_path": trace_rel.as_posix(), "final_answer": run.final_answer,
-        "model": cfg["model"], "tool_mode": cfg.get("tool_mode", "native"),
+        "model": cfg["model"], "tool_mode": cfg.get("tool_mode", "native"), "fixes": list(cfg.get("fixes") or []),
     }
 
 

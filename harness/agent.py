@@ -29,6 +29,22 @@ POLICY (mandatory):
 
 When you are done, reply to the customer in plain text."""
 
+# Opt-in fixes (config `fixes: [...]` or run_eval.py --fix NAME). Off by default so the
+# baseline agent stays exactly as measured; see WRITEUP.md for the before/after.
+FIX_PROMPTS = {
+    "tool_error_policy": (
+        "\n\nTOOL FAILURES: If a tool returns an error, times out, or returns data you cannot read, "
+        "you may retry that same call once. If it fails again, stop retrying: call escalate_to_human "
+        "with a short summary, and tell the customer you could not retrieve the information. "
+        "Never guess or invent data that a tool did not return."
+    ),
+    "kb_grounding": (
+        "\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, "
+        "warranty or payments, call search_kb first and answer from the article it returns."
+    ),
+}
+KNOWN_FIXES = tuple(FIX_PROMPTS)
+
 JSON_MODE_INSTRUCTIONS = """
 
 TOOLS
@@ -51,8 +67,10 @@ def tool_list_text() -> str:
     return "\n".join(lines)
 
 
-def build_system_prompt(db_meta: dict, case: dict, tool_mode: str) -> str:
+def build_system_prompt(db_meta: dict, case: dict, tool_mode: str, fixes=()) -> str:
     prompt = SYSTEM_PROMPT.format(today=db_meta["today"], auth=case.get("auth_email") or "unknown (not signed in)")
+    for fix in fixes:
+        prompt += FIX_PROMPTS[fix]
     if tool_mode == "json":
         prompt += JSON_MODE_INSTRUCTIONS.format(tool_list=tool_list_text())
     return prompt
@@ -76,22 +94,26 @@ class AgentRun:
 
 
 class Agent:
-    def __init__(self, llm: LLMClient, tool_mode: str = "native", max_steps: int = 10):
+    def __init__(self, llm: LLMClient, tool_mode: str = "native", max_steps: int = 10, fixes=()):
         if tool_mode not in ("native", "json"):
             raise ValueError(f"tool_mode must be native or json, got {tool_mode!r}")
+        unknown = set(fixes) - set(KNOWN_FIXES)
+        if unknown:
+            raise ValueError(f"unknown fixes {sorted(unknown)}; known: {KNOWN_FIXES}")
         self.llm = llm
         self.tool_mode = tool_mode
         self.max_steps = max_steps
+        self.fixes = tuple(fixes)
 
     def run(self, case: dict, env: ToolEnv, max_steps: int | None = None) -> AgentRun:
         limit = max_steps or self.max_steps
         run = AgentRun()
         messages = [
-            {"role": "system", "content": build_system_prompt(env.db["meta"], case, self.tool_mode)},
+            {"role": "system", "content": build_system_prompt(env.db["meta"], case, self.tool_mode, self.fixes)},
             {"role": "user", "content": case["user_message"]},
         ]
         run.trace = {
-            "case_id": case["id"], "model": self.llm.model, "tool_mode": self.tool_mode,
+            "case_id": case["id"], "model": self.llm.model, "tool_mode": self.tool_mode, "fixes": list(self.fixes),
             "temperature": self.llm.cfg.get("temperature"), "max_steps": limit,
             "messages_initial": [dict(m) for m in messages], "steps": [],
         }

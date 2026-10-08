@@ -200,7 +200,8 @@ def build_report(run_dir: Path) -> str:
     trials = meta.get("trials", "?")
     sections = [
         f"# Eval report - {run_dir.name}",
-        f"Model `{meta.get('model')}` | tool mode `{meta.get('tool_mode')}` | temperature {meta.get('temperature')} | "
+        f"Model `{meta.get('model')}` | tool mode `{meta.get('tool_mode')}` | fixes `{meta.get('fixes') or 'none'}` | "
+        f"temperature {meta.get('temperature')} | "
         f"{len({r['case_id'] for r in runs})} cases x {trials} trials | label: {meta.get('label') or '-'}",
         "## Headline", headline_table(s),
         f"_Reference cost_ uses ${pricing.get('input_per_1m_usd')}/1M input and ${pricing.get('output_per_1m_usd')}/1M "

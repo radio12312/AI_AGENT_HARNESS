@@ -18,6 +18,7 @@ extra_body: {}
 # --- Agent -----------------------------------------------------------------
 tool_mode: native       # native = API tool calling | json = tools described in the prompt, JSON reply parsed
 max_steps: 10           # LLM calls per run; a case's expected.max_steps overrides it
+fixes: []               # opt-in agent fixes: tool_error_policy, kb_grounding (see WRITEUP.md)
 
 # --- Runner ----------------------------------------------------------------
 concurrency: 2

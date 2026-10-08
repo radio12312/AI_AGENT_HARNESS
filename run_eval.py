@@ -26,13 +26,15 @@ def main(argv=None) -> int:
     ap.add_argument("--config", default=None, help="path to config.yaml")
     ap.add_argument("--out", default=None, help="results directory (default results/<timestamp>)")
     ap.add_argument("--label", default="", help="free-text label stored in meta.json (e.g. 'baseline')")
+    ap.add_argument("--fix", action="append", default=None, metavar="NAME",
+                    help="enable an opt-in agent fix (repeatable), e.g. --fix tool_error_policy")
     ap.add_argument("--resume", default=None, metavar="DIR",
                     help="continue an interrupted run: keep its completed runs, re-run missing and infra_error ones")
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config, {"model": args.model, "tool_mode": args.tool_mode,
                                     "concurrency": args.concurrency, "max_steps": args.max_steps,
-                                    "cases": args.cases})
+                                    "cases": args.cases, "fixes": args.fix})
     cases = load_cases(cfg["cases"])
     if args.resume:
         out_dir = resolve(args.resume)
@@ -54,6 +56,7 @@ def main(argv=None) -> int:
 
     meta = {
         "label": args.label, "model": cfg["model"], "tool_mode": cfg.get("tool_mode"),
+        "fixes": list(cfg.get("fixes") or []),
         "temperature": cfg.get("temperature"), "max_steps_default": cfg.get("max_steps"),
         "trials": args.trials, "concurrency": cfg.get("concurrency"), "cases": [c["id"] for c in cases],
         "pricing": cfg.get("pricing"), "started": time.strftime("%Y-%m-%d %H:%M:%S"),
