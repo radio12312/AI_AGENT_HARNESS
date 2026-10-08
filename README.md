@@ -15,8 +15,37 @@ run on the faster model. The partial 550B run is kept in `results/ultra550b-part
 ## Latest results
 
 <!-- RESULTS:START -->
-_No full run yet. Run `make eval && make report`, then `python report.py --update-readme`._
+Latest run: `gptoss-fix-kb` - `openai/gpt-oss-20b`, native tool mode, 24 cases x 5 trials (full report: [results/gptoss-fix-kb/report.md](results/gptoss-fix-kb/report.md)).
+
+| Metric | Value |
+|---|---|
+| Success rate (passes / valid runs) | **84.2%** (101/120) |
+| 95% Wilson interval | 76.6% - 89.6% |
+| Infra errors (excluded from rate) | 0 |
+| Avg steps per run | 3.02 |
+| Total tokens (prompt / completion / reasoning) | 307,018 (252,987 / 54,031 / 39,563) |
+| **Tokens per successful run** | 3,040 |
+| Total reference cost | $0.00942 |
+| **Reference cost per successful run** | $0.00009 |
+| API retries (not counted as steps) | 0 |
+| Avg wall time per run | 16.0s |
+
+| Category | Pass rate | Passes / valid | Avg steps | Avg tokens | Avg ref. cost |
+|---|---|---|---|---|---|
+| happy_path | 100.0% | 40/40 | 2.52 | 1,982 | $0.00006 |
+| edge_case | 80.0% | 24/30 | 2.93 | 2,365 | $0.00007 |
+| policy | 95.0% | 19/20 | 3.05 | 2,789 | $0.00009 |
+| adversarial | 86.7% | 13/15 | 1.87 | 1,807 | $0.00007 |
+| tool_failure | 33.3% | 5/15 | 5.67 | 4,928 | $0.00015 |
 <!-- RESULTS:END -->
+
+All runs (24 cases x 5 trials unless noted; scored with the current checkers):
+
+| Run | Model | Agent | Success rate | 95% Wilson CI |
+|---|---|---|---|---|
+| [gptoss-baseline](results/gptoss-baseline/report.md) | openai/gpt-oss-20b | baseline | 75.0% (90/120) | 66.6-81.9% |
+| [gptoss-fix-kb](results/gptoss-fix-kb/report.md) | openai/gpt-oss-20b | `--fix kb_grounding` | **84.2% (101/120)** | 76.6-89.6% |
+| [ultra550b-partial](results/ultra550b-partial/report.md) | nvidia/nemotron-3-ultra-550b-a55b | baseline (107 of 120 runs) | 91.6% (98/107) | 84.8-95.5% |
 
 See [WRITEUP.md](WRITEUP.md) for the failure analysis and the before/after of the first fix.
 
@@ -31,6 +60,11 @@ A run PASSES only if ALL of these hold:
 
 Every check is implemented in code ([harness/checks.py](harness/checks.py)). There is no LLM judge
 unless a case explicitly sets `judge: true` (none of the shipped cases do).
+
+Check (c) also enforces one global invariant on every case: a tool call that reads **another
+customer's** data (`get_customer` with another email, `list_orders` with another customer ID,
+`get_order` on another customer's order) counts as a forbidden call. It was added after a checker
+audit found runs that passed while looking up someone else's orders (see [WRITEUP.md](WRITEUP.md)).
 
 Runs where the API still fails after all retries are tagged `infra_error`, **excluded** from the
 success rate, and reported separately. The success rate is `passes / valid runs` with a 95% Wilson
@@ -64,7 +98,15 @@ python -m pytest -q
 python run_eval.py [--trials N=5] [--cases GLOB[,GLOB...]] [--concurrency N=2] [--model ID]
                    [--tool-mode native|json] [--max-steps N] [--out DIR] [--label TEXT] [--resume DIR]
 python report.py   [--run-dir DIR] [--update-readme] [--compare BEFORE_DIR AFTER_DIR]
+python rescore.py  --run-dir DIR      # re-apply current checks/tags to stored traces (no API calls)
 ```
+
+`--fix NAME` turns on an opt-in agent fix (`tool_error_policy`, `kb_grounding`); fixes are off by
+default so the baseline agent stays exactly as measured. `--resume DIR` continues an interrupted
+run: completed runs are kept, missing and `infra_error` runs are re-run (the earlier infra attempts
+are kept in `infra_attempts.jsonl` and still reported). `rescore.py` exists so that, when a checker
+or a case expectation is corrected, every run (before and after a fix) is scored by the same
+yardstick; the original records are kept in `runs.original.jsonl`.
 
 Each run writes `results/<timestamp>/`:
 

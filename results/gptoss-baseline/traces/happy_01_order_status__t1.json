@@ -1,0 +1,158 @@
+{
+  "case_id": "happy_01_order_status",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Hi, where is my order ORD-1002? It hasn't arrived yet."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 3.153,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 495,
+        "completion_tokens": 49,
+        "reasoning_tokens": 20,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The user asks about order ORD-1002. We need to check order details. Use get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-b789b28280ee993e",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1002\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1002"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1002\"}",
+          "result": "{\"order_id\": \"ORD-1002\", \"customer_id\": \"C001\", \"order_date\": \"2026-09-26\", \"status\": \"shipped\", \"items\": [{\"sku\": \"SKU-KBD-02\", \"name\": \"Mechanical Keyboard\", \"qty\": 1, \"unit_price\": 129.0}], \"total\": 129.0, \"delivered_on\": null, \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123456784\", \"estimated_delivery\": \"2026-10-02\", \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 6.223,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 655,
+        "completion_tokens": 221,
+        "reasoning_tokens": 109,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Your order (ORD‑1002) was shipped on 26 Sep 2026 via UPS.  \nHere’s the tracking information:\n\n- **Tracking number:** 1Z999AA10123456784  \n- **Carrier:** UPS  \n- **Estimated delivery:** 2 Oct 2026  \n\nYou can enter the tracking number on the UPS website or the UPS mobile app to see the most recent location of your shipment. If you still have questions or notice a delay beyond the estimated delivery date, just let me know and I’ll help you further.",
+        "reasoning": "We have order ORD-1002, shipped 2026-09-26, status shipped, estimated delivery 2026-10-02. The customer is asking \"where is my order? hasn't arrived yet.\" We should check shipping status. It's shipped, tracking number provided. We can provide tracking info. The policy about refunds: only for orders delivered within last 30 days. Not relevant. So we should respond with shipping status and tracking number, maybe encourage them to check.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Your order (ORD‑1002) was shipped on 26 Sep 2026 via UPS.  \nHere’s the tracking information:\n\n- **Tracking number:** 1Z999AA10123456784  \n- **Carrier:** UPS  \n- **Estimated delivery:** 2 Oct 2026  \n\nYou can enter the tracking number on the UPS website or the UPS mobile app to see the most recent location of your shipment. If you still have questions or notice a delay beyond the estimated delivery date, just let me know and I’ll help you further.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Hi, where is my order ORD-1002? It hasn't arrived yet."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-b789b28280ee993e",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1002\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b789b28280ee993e",
+      "content": "{\"order_id\": \"ORD-1002\", \"customer_id\": \"C001\", \"order_date\": \"2026-09-26\", \"status\": \"shipped\", \"items\": [{\"sku\": \"SKU-KBD-02\", \"name\": \"Mechanical Keyboard\", \"qty\": 1, \"unit_price\": 129.0}], \"total\": 129.0, \"delivered_on\": null, \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123456784\", \"estimated_delivery\": \"2026-10-02\", \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "Your order (ORD‑1002) was shipped on 26 Sep 2026 via UPS.  \nHere’s the tracking information:\n\n- **Tracking number:** 1Z999AA10123456784  \n- **Carrier:** UPS  \n- **Estimated delivery:** 2 Oct 2026  \n\nYou can enter the tracking number on the UPS website or the UPS mobile app to see the most recent location of your shipment. If you still have questions or notice a delay beyond the estimated delivery date, just let me know and I’ll help you further."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1150,
+    "completion_tokens": 270,
+    "reasoning_tokens": 129
+  },
+  "llm_latency_s": 9.375,
+  "wall_time_s": 9.653,
+  "retries": 0,
+  "trial": 1,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "shipped",
+      "1Z999AA10123456784"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1002"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

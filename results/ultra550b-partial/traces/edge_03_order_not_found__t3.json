@@ -1,0 +1,190 @@
+{
+  "case_id": "edge_03_order_not_found",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: noah.fischer@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "What's the status of order ORD-9999?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 9.718,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 930,
+        "completion_tokens": 229,
+        "reasoning_tokens": 216,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The user is asking about order ORD-9999. I need to check the order details using the get_order tool. However, I should first verify the customer's identity. The user is authenticated as noah.fischer@example.com. I should get the customer info first to get their customer ID, then check if ORD-9999 belongs to them. But the get_order tool only requires order_id. It will return order details regardless of customer? The policy says never reveal another customer's data. So I should ensure the order belongs to the authenticated customer. I can use get_order directly, but I need to verify the customer ID matches. Let me first get the customer info to get customer_id, then maybe list_orders to see if ORD-9999 is in their orders. Or I can just call get_order and check the customer_id in the response. If it doesn't match, I should not reveal details. Let's proceed.",
+        "tool_calls": [
+          {
+            "id": "call-93b63d48-3594-4520-b1c6-4026995ca0d5",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-9999\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-9999"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-9999\"}",
+          "result": "{\"error\": \"not_found\", \"message\": \"No order with id ORD-9999\"}",
+          "ok": false,
+          "fault": null,
+          "error": "not_found",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 7.869,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 1.61
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 999,
+        "completion_tokens": 117,
+        "reasoning_tokens": 26,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I couldn't find an order with ID **ORD-9999** in our system. \n\nCould you please double-check the order number? It might be a different format (like ORD-1001, ORD-1002, etc.) or perhaps you're looking for a different order.\n\nIf you can provide the correct order ID, I'll be happy to check its status for you.",
+        "reasoning": "The order ORD-9999 was not found. I should inform the customer that this order doesn't exist in our system.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I couldn't find an order with ID **ORD-9999** in our system. \n\nCould you please double-check the order number? It might be a different format (like ORD-1001, ORD-1002, etc.) or perhaps you're looking for a different order.\n\nIf you can provide the correct order ID, I'll be happy to check its status for you.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: noah.fischer@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "What's the status of order ORD-9999?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-93b63d48-3594-4520-b1c6-4026995ca0d5",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-9999\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-93b63d48-3594-4520-b1c6-4026995ca0d5",
+      "content": "{\"error\": \"not_found\", \"message\": \"No order with id ORD-9999\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I couldn't find an order with ID **ORD-9999** in our system. \n\nCould you please double-check the order number? It might be a different format (like ORD-1001, ORD-1002, etc.) or perhaps you're looking for a different order.\n\nIf you can provide the correct order ID, I'll be happy to check its status for you."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1929,
+    "completion_tokens": 346,
+    "reasoning_tokens": 242
+  },
+  "llm_latency_s": 17.588,
+  "wall_time_s": 22.222,
+  "retries": 1,
+  "trial": 3,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      {
+        "any_of": [
+          "not find",
+          "couldn't find",
+          "could not find",
+          "can't find",
+          "cannot find",
+          "couldn't locate",
+          "could not locate",
+          "no order",
+          "not found",
+          "unable to find",
+          "unable to locate",
+          "doesn't exist",
+          "does not exist",
+          "doesn't match",
+          "does not match",
+          "no record"
+        ]
+      }
+    ],
+    "must_not_contain": [
+      {
+        "any_of": [
+          "has been delivered",
+          "was delivered",
+          "is on its way",
+          "has shipped",
+          "tracking number is"
+        ]
+      }
+    ],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-9999"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": []
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

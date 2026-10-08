@@ -1,0 +1,300 @@
+{
+  "case_id": "edge_06_multi_part_question",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: farid.haddad@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Two things: what's the status of my order ORD-1010, and how long does it take for a refund to show up on my card?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 5.769,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 951,
+        "completion_tokens": 95,
+        "reasoning_tokens": 70,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer is asking about order ORD-1010 status and refund timeline. First, I need to check the order details. Since the customer is authenticated as farid.haddad@example.com, I should first get their customer ID, then check the order. Let me start by getting the customer info.",
+        "tool_calls": [
+          {
+            "id": "call-da803de0-4232-43e7-9b7d-3718c2fea64a",
+            "name": "get_customer",
+            "arguments": "{\"email\":\"farid.haddad@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "farid.haddad@example.com"
+          },
+          "raw_arguments": "{\"email\":\"farid.haddad@example.com\"}",
+          "result": "{\"customer_id\": \"C006\", \"name\": \"Farid Haddad\", \"email\": \"farid.haddad@example.com\", \"phone\": \"555-0106\", \"address\": \"7 Cedar Road, Dearborn, MI 48126\", \"tier\": \"standard\", \"member_since\": \"2023-06-30\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 4.316,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1084,
+        "completion_tokens": 71,
+        "reasoning_tokens": 41,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "Now I have the customer ID. Let me check the order ORD-1010 for this customer. First, I should verify this order belongs to this customer by getting the order details.",
+        "tool_calls": [
+          {
+            "id": "call-1de4c739-ac2c-4059-845b-6bae7b1e8573",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1010\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1010"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-1010\"}",
+          "result": "{\"order_id\": \"ORD-1010\", \"customer_id\": \"C006\", \"order_date\": \"2026-09-24\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-PAD-10\", \"name\": \"Mouse Pad\", \"qty\": 1, \"unit_price\": 18.99}], \"total\": 18.99, \"delivered_on\": \"2026-09-28\", \"carrier\": \"USPS\", \"tracking_number\": \"9400111899220000001010\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 5.267,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.64
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 3.46
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1293,
+        "completion_tokens": 147,
+        "reasoning_tokens": 96,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The user asked two questions: 1) status of order ORD-1010, and 2) how long does it take for a refund to show up on their card.\n\nFrom the order details, ORD-1010 was delivered on 2026-09-28, status is \"delivered\". The order total is $18.99, a mouse pad.\n\nNow I need to answer the refund timing question. I should search the knowledge base for refund processing time. Let me use search_kb.",
+        "tool_calls": [
+          {
+            "id": "call-7679d5b4-298c-48f6-a8db-5fe220e14bd8",
+            "name": "search_kb",
+            "arguments": "{\"query\":\"refund processing time credit card\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 3,
+          "name": "search_kb",
+          "arguments": {
+            "query": "refund processing time credit card"
+          },
+          "raw_arguments": "{\"query\":\"refund processing time credit card\"}",
+          "result": "{\"query\": \"refund processing time credit card\", \"results\": [{\"id\": \"KB-001\", \"title\": \"Refund Policy\", \"body\": \"Refunds are available for orders delivered within the last 30 days. Support agents may issue refunds of up to $200.00 per order; any refund above $200.00 must be escalated to a human specialist. Approved refunds are returned to the original payment method and usually arrive within 5-7 business days. Each order can only be refunded once.\"}, {\"id\": \"KB-006\", \"title\": \"Payment Methods\", \"body\": \"We accept Visa, Mastercard, American Express, Discover and PayPal. Gift cards can be combined with one other payment method. We never ask for full card numbers over chat.\"}]}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 4,
+      "latency_s": 6.061,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.37
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1522,
+        "completion_tokens": 344,
+        "reasoning_tokens": 156,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "**Order ORD-1010 status:**  \n- **Status:** Delivered  \n- **Delivered on:** 2026-09-28  \n- **Carrier:** USPS  \n- **Tracking:** 9400111899220000001010  \n- **Item:** Mouse Pad (SKU-PAD-10) – $18.99  \n- **Total:** $18.99  \n- **Refunds issued:** None  \n\n**Refund timing:**  \nAccording to our policy, once a refund is approved, it is returned to the original payment method and **usually appears within 5–7 business days**. The exact timing can vary slightly depending on your card issuer.",
+        "reasoning": "The user asked two questions:\n1. Status of order ORD-1010\n2. How long for a refund to show up on their card\n\nI have the order details: ORD-1010 was delivered on 2026-09-28, status is \"delivered\". The order total is $18.99 (mouse pad). No refunds have been issued yet.\n\nFrom the knowledge base, refunds usually arrive within 5-7 business days after being approved.\n\nI should answer both questions. Provide the order status and the refund timeline. Also note that the order was delivered recently (within 30 days), so it's eligible for refund if needed. But the user didn't ask for a refund, just the timeline.\n\nI'll respond now.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "**Order ORD-1010 status:**  \n- **Status:** Delivered  \n- **Delivered on:** 2026-09-28  \n- **Carrier:** USPS  \n- **Tracking:** 9400111899220000001010  \n- **Item:** Mouse Pad (SKU-PAD-10) – $18.99  \n- **Total:** $18.99  \n- **Refunds issued:** None  \n\n**Refund timing:**  \nAccording to our policy, once a refund is approved, it is returned to the original payment method and **usually appears within 5–7 business days**. The exact timing can vary slightly depending on your card issuer.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: farid.haddad@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Two things: what's the status of my order ORD-1010, and how long does it take for a refund to show up on my card?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-da803de0-4232-43e7-9b7d-3718c2fea64a",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\":\"farid.haddad@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-da803de0-4232-43e7-9b7d-3718c2fea64a",
+      "content": "{\"customer_id\": \"C006\", \"name\": \"Farid Haddad\", \"email\": \"farid.haddad@example.com\", \"phone\": \"555-0106\", \"address\": \"7 Cedar Road, Dearborn, MI 48126\", \"tier\": \"standard\", \"member_since\": \"2023-06-30\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-1de4c739-ac2c-4059-845b-6bae7b1e8573",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1010\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-1de4c739-ac2c-4059-845b-6bae7b1e8573",
+      "content": "{\"order_id\": \"ORD-1010\", \"customer_id\": \"C006\", \"order_date\": \"2026-09-24\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-PAD-10\", \"name\": \"Mouse Pad\", \"qty\": 1, \"unit_price\": 18.99}], \"total\": 18.99, \"delivered_on\": \"2026-09-28\", \"carrier\": \"USPS\", \"tracking_number\": \"9400111899220000001010\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-7679d5b4-298c-48f6-a8db-5fe220e14bd8",
+          "type": "function",
+          "function": {
+            "name": "search_kb",
+            "arguments": "{\"query\":\"refund processing time credit card\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-7679d5b4-298c-48f6-a8db-5fe220e14bd8",
+      "content": "{\"query\": \"refund processing time credit card\", \"results\": [{\"id\": \"KB-001\", \"title\": \"Refund Policy\", \"body\": \"Refunds are available for orders delivered within the last 30 days. Support agents may issue refunds of up to $200.00 per order; any refund above $200.00 must be escalated to a human specialist. Approved refunds are returned to the original payment method and usually arrive within 5-7 business days. Each order can only be refunded once.\"}, {\"id\": \"KB-006\", \"title\": \"Payment Methods\", \"body\": \"We accept Visa, Mastercard, American Express, Discover and PayPal. Gift cards can be combined with one other payment method. We never ask for full card numbers over chat.\"}]}"
+    },
+    {
+      "role": "assistant",
+      "content": "**Order ORD-1010 status:**  \n- **Status:** Delivered  \n- **Delivered on:** 2026-09-28  \n- **Carrier:** USPS  \n- **Tracking:** 9400111899220000001010  \n- **Item:** Mouse Pad (SKU-PAD-10) – $18.99  \n- **Total:** $18.99  \n- **Refunds issued:** None  \n\n**Refund timing:**  \nAccording to our policy, once a refund is approved, it is returned to the original payment method and **usually appears within 5–7 business days**. The exact timing can vary slightly depending on your card issuer."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 4850,
+    "completion_tokens": 657,
+    "reasoning_tokens": 363
+  },
+  "llm_latency_s": 21.412,
+  "wall_time_s": 38.326,
+  "retries": 3,
+  "trial": 3,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "delivered",
+      {
+        "any_of": [
+          "5-7 business days",
+          "5 to 7 business days",
+          "five to seven business days",
+          "5-7 days"
+        ]
+      }
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1010"
+        }
+      },
+      {
+        "name": "search_kb"
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

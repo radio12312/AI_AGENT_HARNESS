@@ -1,0 +1,241 @@
+{
+  "case_id": "edge_04_customer_zero_orders",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: maya.patel@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you show me my recent orders?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 10.935,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 924,
+        "completion_tokens": 79,
+        "reasoning_tokens": 58,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The user is asking to see their recent orders. They're authenticated as maya.patel@example.com. I need to first get their customer ID using get_customer, then use list_orders to show their recent orders. Let me start with get_customer.",
+        "tool_calls": [
+          {
+            "id": "call-0e7358df-8503-41d1-b9e2-725b9ebb8e77",
+            "name": "get_customer",
+            "arguments": "{\"email\":\"maya.patel@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "maya.patel@example.com"
+          },
+          "raw_arguments": "{\"email\":\"maya.patel@example.com\"}",
+          "result": "{\"customer_id\": \"C013\", \"name\": \"Maya Patel\", \"email\": \"maya.patel@example.com\", \"phone\": \"555-0113\", \"address\": \"48 Lotus St, Edison, NJ 08817\", \"tier\": \"standard\", \"member_since\": \"2026-09-01\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 10.429,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1052,
+        "completion_tokens": 42,
+        "reasoning_tokens": 13,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "Now I have the customer ID. Let me get their orders.",
+        "tool_calls": [
+          {
+            "id": "call-bc533fcc-d3f0-4671-8e56-2b2fd7503d1b",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\":\"C013\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C013"
+          },
+          "raw_arguments": "{\"customer_id\":\"C013\"}",
+          "result": "{\"customer_id\": \"C013\", \"orders\": [], \"count\": 0}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 6.529,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1116,
+        "completion_tokens": 76,
+        "reasoning_tokens": 33,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "You don't have any orders in your account yet. If you've placed an order recently and don't see it here, please let me know the order ID or approximate date so I can look into it further.",
+        "reasoning": "The customer Maya Patel (C013) has no orders according to the list_orders tool. I should inform them that they have no recent orders.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "You don't have any orders in your account yet. If you've placed an order recently and don't see it here, please let me know the order ID or approximate date so I can look into it further.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: maya.patel@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you show me my recent orders?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-0e7358df-8503-41d1-b9e2-725b9ebb8e77",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\":\"maya.patel@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-0e7358df-8503-41d1-b9e2-725b9ebb8e77",
+      "content": "{\"customer_id\": \"C013\", \"name\": \"Maya Patel\", \"email\": \"maya.patel@example.com\", \"phone\": \"555-0113\", \"address\": \"48 Lotus St, Edison, NJ 08817\", \"tier\": \"standard\", \"member_since\": \"2026-09-01\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-bc533fcc-d3f0-4671-8e56-2b2fd7503d1b",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\":\"C013\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-bc533fcc-d3f0-4671-8e56-2b2fd7503d1b",
+      "content": "{\"customer_id\": \"C013\", \"orders\": [], \"count\": 0}"
+    },
+    {
+      "role": "assistant",
+      "content": "You don't have any orders in your account yet. If you've placed an order recently and don't see it here, please let me know the order ID or approximate date so I can look into it further."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 3092,
+    "completion_tokens": 197,
+    "reasoning_tokens": 104
+  },
+  "llm_latency_s": 27.893,
+  "wall_time_s": 30.027,
+  "retries": 0,
+  "trial": 2,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      {
+        "any_of": [
+          "no orders",
+          "don't have any",
+          "do not have any",
+          "haven't placed",
+          "have not placed",
+          "not placed any",
+          "no order",
+          "0 orders",
+          "zero orders",
+          "not have any orders",
+          "any orders yet",
+          "find any orders",
+          "find any recent orders",
+          "no recent orders",
+          "see any orders",
+          "see any recent orders"
+        ]
+      }
+    ],
+    "must_not_contain": [
+      "ORD-"
+    ],
+    "expected_tool_calls": [
+      {
+        "name": "get_customer",
+        "args": {
+          "email": "maya.patel@example.com"
+        }
+      },
+      {
+        "name": "list_orders",
+        "args": {
+          "customer_id": "C013"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

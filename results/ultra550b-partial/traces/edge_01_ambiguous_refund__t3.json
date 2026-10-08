@@ -1,0 +1,243 @@
+{
+  "case_id": "edge_01_ambiguous_refund",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: olivia.rossi@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "I want a refund for my order."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 3.344,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 925,
+        "completion_tokens": 74,
+        "reasoning_tokens": 54,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "I need to help this customer with a refund request. First, I should get their customer information to see their orders, then understand which order they want a refund for. Let me start by getting their customer details.",
+        "tool_calls": [
+          {
+            "id": "call-a7f7d638-1686-492e-bd05-94c27d022e2d",
+            "name": "get_customer",
+            "arguments": "{\"email\":\"olivia.rossi@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "olivia.rossi@example.com"
+          },
+          "raw_arguments": "{\"email\":\"olivia.rossi@example.com\"}",
+          "result": "{\"customer_id\": \"C015\", \"name\": \"Olivia Rossi\", \"email\": \"olivia.rossi@example.com\", \"phone\": \"555-0115\", \"address\": \"77 Vine St, Brooklyn, NY 11201\", \"tier\": \"standard\", \"member_since\": \"2024-02-28\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 2.576,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.37
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 3.62
+        },
+        {
+          "attempt": 3,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 5.42
+        },
+        {
+          "attempt": 4,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 14.44
+        },
+        {
+          "attempt": 5,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 17.03
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1057,
+        "completion_tokens": 52,
+        "reasoning_tokens": 25,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "Now I have the customer ID. Let me list their orders to see which ones they might want a refund for.",
+        "tool_calls": [
+          {
+            "id": "call-19847967-f2ef-4b47-998d-472005231b8e",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\":\"C015\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C015"
+          },
+          "raw_arguments": "{\"customer_id\":\"C015\"}",
+          "result": "{\"customer_id\": \"C015\", \"orders\": [{\"order_id\": \"ORD-1027\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"total\": 54.0}, {\"order_id\": \"ORD-1028\", \"order_date\": \"2026-09-18\", \"status\": \"delivered\", \"total\": 119.0}, {\"order_id\": \"ORD-1029\", \"order_date\": \"2026-09-18\", \"status\": \"delivered\", \"total\": 14.99}, {\"order_id\": \"ORD-1030\", \"order_date\": \"2026-09-27\", \"status\": \"shipped\", \"total\": 49.0}], \"count\": 4}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 18.927,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1300,
+        "completion_tokens": 325,
+        "reasoning_tokens": 132,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I can see you have three delivered orders that are eligible for refunds (within the last 30 days):\n\n1. **ORD-1027** - Delivered 2026-09-15 - $54.00\n2. **ORD-1028** - Delivered 2026-09-18 - $119.00  \n3. **ORD-1029** - Delivered 2026-09-18 - $14.99\n\nYour order ORD-1030 is currently shipped but not yet delivered.\n\nWhich order would you like a refund for, and what's the reason for the return?",
+        "reasoning": "I can see Olivia has 4 orders. Three are delivered (ORD-1027, ORD-1028, ORD-1029) and one is shipped (ORD-1030). The customer wants a refund but hasn't specified which order. I need to ask which order they want a refund for, and then check if it's eligible (delivered within last 30 days). Today is 2026-09-30, so orders delivered on or after 2026-08-31 would be within 30 days. All three delivered orders are from September 2026, so they're all within 30 days. I should ask for the order ID and reason for refund. Let me respond.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I can see you have three delivered orders that are eligible for refunds (within the last 30 days):\n\n1. **ORD-1027** - Delivered 2026-09-15 - $54.00\n2. **ORD-1028** - Delivered 2026-09-18 - $119.00  \n3. **ORD-1029** - Delivered 2026-09-18 - $14.99\n\nYour order ORD-1030 is currently shipped but not yet delivered.\n\nWhich order would you like a refund for, and what's the reason for the return?",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: olivia.rossi@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "I want a refund for my order."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-a7f7d638-1686-492e-bd05-94c27d022e2d",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\":\"olivia.rossi@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-a7f7d638-1686-492e-bd05-94c27d022e2d",
+      "content": "{\"customer_id\": \"C015\", \"name\": \"Olivia Rossi\", \"email\": \"olivia.rossi@example.com\", \"phone\": \"555-0115\", \"address\": \"77 Vine St, Brooklyn, NY 11201\", \"tier\": \"standard\", \"member_since\": \"2024-02-28\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-19847967-f2ef-4b47-998d-472005231b8e",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\":\"C015\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-19847967-f2ef-4b47-998d-472005231b8e",
+      "content": "{\"customer_id\": \"C015\", \"orders\": [{\"order_id\": \"ORD-1027\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"total\": 54.0}, {\"order_id\": \"ORD-1028\", \"order_date\": \"2026-09-18\", \"status\": \"delivered\", \"total\": 119.0}, {\"order_id\": \"ORD-1029\", \"order_date\": \"2026-09-18\", \"status\": \"delivered\", \"total\": 14.99}, {\"order_id\": \"ORD-1030\", \"order_date\": \"2026-09-27\", \"status\": \"shipped\", \"total\": 49.0}], \"count\": 4}"
+    },
+    {
+      "role": "assistant",
+      "content": "I can see you have three delivered orders that are eligible for refunds (within the last 30 days):\n\n1. **ORD-1027** - Delivered 2026-09-15 - $54.00\n2. **ORD-1028** - Delivered 2026-09-18 - $119.00  \n3. **ORD-1029** - Delivered 2026-09-18 - $14.99\n\nYour order ORD-1030 is currently shipped but not yet delivered.\n\nWhich order would you like a refund for, and what's the reason for the return?"
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 3282,
+    "completion_tokens": 451,
+    "reasoning_tokens": 211
+  },
+  "llm_latency_s": 24.847,
+  "wall_time_s": 69.358,
+  "retries": 5,
+  "trial": 3,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      {
+        "any_of": [
+          "which order",
+          "which of",
+          "which one",
+          "order number",
+          "order id",
+          "specify",
+          "clarify",
+          "let me know"
+        ]
+      }
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": []
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

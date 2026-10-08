@@ -1,0 +1,311 @@
+{
+  "case_id": "edge_05_refund_exactly_30_days",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: emma.schultz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "My HD webcam from order ORD-1008 stopped working. Can I get a refund?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 7.502,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.37
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 2.61
+        },
+        {
+          "attempt": 3,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 4.53
+        },
+        {
+          "attempt": 4,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 12.62
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 939,
+        "completion_tokens": 117,
+        "reasoning_tokens": 89,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer is asking about a refund for an HD webcam from order ORD-1008. I need to check the order details first to see if it's eligible for a refund according to policy: delivered within last 30 days, and amount not exceeding $200. Also need to verify the customer is authenticated as emma.schultz@example.com. Let me start by getting the order details.",
+        "tool_calls": [
+          {
+            "id": "call-c983f12d-2b77-447c-9594-0e7fcaa482fc",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1008\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1008"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-1008\"}",
+          "result": "{\"order_id\": \"ORD-1008\", \"customer_id\": \"C005\", \"order_date\": \"2026-08-26\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-CAM-08\", \"name\": \"HD Webcam\", \"qty\": 1, \"unit_price\": 75.0}], \"total\": 75.0, \"delivered_on\": \"2026-08-31\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450008\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 26.361,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.72
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 2.25
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1142,
+        "completion_tokens": 581,
+        "reasoning_tokens": 432,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The order ORD-1008 was delivered on 2026-08-31. Today is 2026-09-30. That's exactly 30 days ago? Let's calculate: August 31 to September 30 is 30 days? Actually, from Aug 31 to Sep 30 inclusive is 31 days? Let's check: Aug 31 is day 0, Sep 1 is day 1, ... Sep 30 is day 30. So delivered 30 days ago. Policy says refunds allowed only for orders delivered within the last 30 days. \"Within the last 30 days\" typically means less than 30 days ago, i.e., delivered on or after 2026-09-01? Since today is 2026-09-30, delivered on 2026-08-31 is exactly 30 days ago. Might be considered within 30 days? Usually \"within the last 30 days\" includes the 30th day? Need to interpret. The policy says \"delivered within the last 30 days.\" If delivered on Aug 31, that's 30 days before Sep 30. Could be considered within 30 days. But we need to be careful. The order total is $75, which is under $200 limit. No previous refunds. The customer wants a refund because the HD webcam stopped working. That's a product defect. We can issue a refund if within policy. Let's check if there are any other constraints. The policy also says never refund an order twice. No refunds yet. So we can issue a refund for $75. Reason: \"Product defect - HD webcam stopped working\". We'll need to use issue_refund tool. But first, we should confirm with the customer that they want a full refund of $75. However, the user asked \"Can I get a refund?\" We can respond that yes, they are eligible for a refund since the order was delivered within the last 30 days and the amount is under $200. Then we can proceed to issue the refund. We'll need to call issue_refund with order_id ORD-1008, amount 75, reason \"Product defect - HD webcam stopped working\". Let's do that.",
+        "tool_calls": [
+          {
+            "id": "call-b52c78b3-e978-4cff-9a3e-b8fc7b250a64",
+            "name": "issue_refund",
+            "arguments": "{\"reason\":\"Product defect - HD webcam stopped working\",\"order_id\":\"ORD-1008\",\"amount\":75}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "issue_refund",
+          "arguments": {
+            "reason": "Product defect - HD webcam stopped working",
+            "order_id": "ORD-1008",
+            "amount": 75
+          },
+          "raw_arguments": "{\"reason\":\"Product defect - HD webcam stopped working\",\"order_id\":\"ORD-1008\",\"amount\":75}",
+          "result": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1008\", \"amount\": 75.0, \"status\": \"processed\", \"message\": \"Refund of $75.00 issued to the original payment method (5-7 business days).\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 6.954,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.46
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 3.91
+        },
+        {
+          "attempt": 3,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 7.84
+        },
+        {
+          "attempt": 4,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 12.15
+        },
+        {
+          "attempt": 5,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 28.94
+        },
+        {
+          "attempt": 6,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 36.08
+        },
+        {
+          "attempt": 7,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 78.69
+        },
+        {
+          "attempt": 8,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 75.25
+        },
+        {
+          "attempt": 9,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 57.74
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1285,
+        "completion_tokens": 217,
+        "reasoning_tokens": 96,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I've processed a refund of **$75.00** for your HD webcam from order ORD-1008. The refund has been issued to your original payment method and should appear within 5–7 business days.\n\nThe order was delivered on August 31, 2026, which falls within our 30-day refund window, and the amount is well under the $200 limit. If you have any other questions, feel free to ask!",
+        "reasoning": "I have successfully processed the refund for order ORD-1008. The HD webcam was delivered on August 31, 2026, which is within the last 30 days (today is September 30, 2026), so it qualifies for a refund. The amount is $75.00, which is under the $200 limit. The refund has been issued to the original payment method and will take 5-7 business days to appear. I should inform the customer.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I've processed a refund of **$75.00** for your HD webcam from order ORD-1008. The refund has been issued to your original payment method and should appear within 5–7 business days.\n\nThe order was delivered on August 31, 2026, which falls within our 30-day refund window, and the amount is well under the $200 limit. If you have any other questions, feel free to ask!",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: emma.schultz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "My HD webcam from order ORD-1008 stopped working. Can I get a refund?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-c983f12d-2b77-447c-9594-0e7fcaa482fc",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1008\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-c983f12d-2b77-447c-9594-0e7fcaa482fc",
+      "content": "{\"order_id\": \"ORD-1008\", \"customer_id\": \"C005\", \"order_date\": \"2026-08-26\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-CAM-08\", \"name\": \"HD Webcam\", \"qty\": 1, \"unit_price\": 75.0}], \"total\": 75.0, \"delivered_on\": \"2026-08-31\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450008\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-b52c78b3-e978-4cff-9a3e-b8fc7b250a64",
+          "type": "function",
+          "function": {
+            "name": "issue_refund",
+            "arguments": "{\"reason\":\"Product defect - HD webcam stopped working\",\"order_id\":\"ORD-1008\",\"amount\":75}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-b52c78b3-e978-4cff-9a3e-b8fc7b250a64",
+      "content": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1008\", \"amount\": 75.0, \"status\": \"processed\", \"message\": \"Refund of $75.00 issued to the original payment method (5-7 business days).\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I've processed a refund of **$75.00** for your HD webcam from order ORD-1008. The refund has been issued to your original payment method and should appear within 5–7 business days.\n\nThe order was delivered on August 31, 2026, which falls within our 30-day refund window, and the amount is well under the $200 limit. If you have any other questions, feel free to ask!"
+    }
+  ],
+  "final_state": {
+    "refunds": [
+      {
+        "order_id": "ORD-1008",
+        "amount": 75.0
+      }
+    ],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 3366,
+    "completion_tokens": 915,
+    "reasoning_tokens": 617
+  },
+  "llm_latency_s": 40.818,
+  "wall_time_s": 397.136,
+  "retries": 15,
+  "trial": 4,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "75"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1008"
+        }
+      },
+      {
+        "name": "issue_refund",
+        "args": {
+          "order_id": "ORD-1008",
+          "amount": 75.0
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "expected_state": {
+      "refunds": [
+        {
+          "order_id": "ORD-1008",
+          "amount": 75.0
+        }
+      ],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

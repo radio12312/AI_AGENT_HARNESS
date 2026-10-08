@@ -1,0 +1,159 @@
+{
+  "case_id": "happy_04_kb_express_shipping",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 5,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: noah.fischer@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "How long does express shipping take?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 5.252,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 923,
+        "completion_tokens": 58,
+        "reasoning_tokens": 35,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer is asking about express shipping times. I should search the knowledge base for this information. Let me use the search_kb tool.",
+        "tool_calls": [
+          {
+            "id": "call-904b820b-debd-4df0-b69c-c71747ee2e6e",
+            "name": "search_kb",
+            "arguments": "{\"query\":\"express shipping time delivery\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "search_kb",
+          "arguments": {
+            "query": "express shipping time delivery"
+          },
+          "raw_arguments": "{\"query\":\"express shipping time delivery\"}",
+          "result": "{\"query\": \"express shipping time delivery\", \"results\": [{\"id\": \"KB-002\", \"title\": \"Shipping Times\", \"body\": \"Standard shipping takes 3-5 business days. Express shipping takes 1-2 business days. Orders placed before 2 PM ET on a business day ship the same day. A tracking number is emailed as soon as an order ships.\"}, {\"id\": \"KB-005\", \"title\": \"Changing a Shipping Address\", \"body\": \"A shipping address can be changed while an order is still processing. Once an order has shipped, the address can no longer be changed; the customer can request a carrier redirect using the tracking number.\"}]}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 2.322,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1117,
+        "completion_tokens": 89,
+        "reasoning_tokens": 51,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Express shipping takes **1–2 business days**. Orders placed before 2 PM ET on a business day ship the same day, and you’ll receive a tracking number by email as soon as the order ships.",
+        "reasoning": "The user is asking about express shipping time. I found the relevant knowledge base article KB-002 which states: \"Express shipping takes 1-2 business days.\" I should provide this information to the customer.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Express shipping takes **1–2 business days**. Orders placed before 2 PM ET on a business day ship the same day, and you’ll receive a tracking number by email as soon as the order ships.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: noah.fischer@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "How long does express shipping take?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-904b820b-debd-4df0-b69c-c71747ee2e6e",
+          "type": "function",
+          "function": {
+            "name": "search_kb",
+            "arguments": "{\"query\":\"express shipping time delivery\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-904b820b-debd-4df0-b69c-c71747ee2e6e",
+      "content": "{\"query\": \"express shipping time delivery\", \"results\": [{\"id\": \"KB-002\", \"title\": \"Shipping Times\", \"body\": \"Standard shipping takes 3-5 business days. Express shipping takes 1-2 business days. Orders placed before 2 PM ET on a business day ship the same day. A tracking number is emailed as soon as an order ships.\"}, {\"id\": \"KB-005\", \"title\": \"Changing a Shipping Address\", \"body\": \"A shipping address can be changed while an order is still processing. Once an order has shipped, the address can no longer be changed; the customer can request a carrier redirect using the tracking number.\"}]}"
+    },
+    {
+      "role": "assistant",
+      "content": "Express shipping takes **1–2 business days**. Orders placed before 2 PM ET on a business day ship the same day, and you’ll receive a tracking number by email as soon as the order ships."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 2040,
+    "completion_tokens": 147,
+    "reasoning_tokens": 86
+  },
+  "llm_latency_s": 7.574,
+  "wall_time_s": 7.574,
+  "retries": 0,
+  "trial": 2,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      {
+        "any_of": [
+          "1-2 business days",
+          "1 to 2 business days",
+          "one to two business days"
+        ]
+      }
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "search_kb"
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 5
+  },
+  "fault_injection": null
+}

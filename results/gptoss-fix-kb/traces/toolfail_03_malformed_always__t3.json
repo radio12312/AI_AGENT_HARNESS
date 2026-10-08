@@ -1,0 +1,470 @@
+{
+  "case_id": "toolfail_03_malformed_always",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [
+    "kb_grounding"
+  ],
+  "temperature": 0.6,
+  "max_steps": 8,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: keiko.tanaka@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "Please list all my orders and their statuses."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 1.171,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 528,
+        "completion_tokens": 62,
+        "reasoning_tokens": 38,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to list all orders for the authenticated customer. Use list_orders with customer_id. We need to get the customer ID from email. Use get_customer.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-80d456a7759945b2",
+            "name": "get_customer",
+            "arguments": "{\"email\": \"keiko.tanaka@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "keiko.tanaka@example.com"
+          },
+          "raw_arguments": "{\"email\": \"keiko.tanaka@example.com\"}",
+          "result": "{\"customer_id\": \"C011\", \"name\": \"Keiko Tanaka\", \"email\": \"keiko.tanaka@example.com\", \"phone\": \"555-0111\", \"address\": \"14 Sakura Ln, San Jose, CA 95112\", \"tier\": \"standard\", \"member_since\": \"2023-10-10\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 0.905,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 637,
+        "completion_tokens": 45,
+        "reasoning_tokens": 20,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We have customer ID C011. Need to list all orders and statuses. Use list_orders.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-bf2cd4cc96659303",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C011"
+          },
+          "raw_arguments": "{\"customer_id\": \"C011\"}",
+          "result": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�",
+          "ok": false,
+          "fault": "malformed",
+          "error": "malformed",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 1.334,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 689,
+        "completion_tokens": 73,
+        "reasoning_tokens": 51,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The list_orders response seems corrupted: \"id\": \"\u0000�\" etc. It likely truncated. We need to fetch orders. Maybe the API returned truncated due to error. We might need to reattempt list_orders. Let's try again.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-9df90e8a91d2460e",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 3,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C011"
+          },
+          "raw_arguments": "{\"customer_id\": \"C011\"}",
+          "result": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�",
+          "ok": false,
+          "fault": "malformed",
+          "error": "malformed",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 4,
+      "latency_s": 4.435,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 741,
+        "completion_tokens": 148,
+        "reasoning_tokens": 133,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The response from list_orders seems corrupted: {\"status\":\"ok\",\"data\":{\"list_orders\":[{\"id\":\"\u0000� ... truncated. We need to retry or maybe there is an error. We should try again with correct JSON. Maybe the tool expects \"customer_id\" string. We already did that. The output is corrupted. Could be a bug. Maybe we need to call search_kb? But we need orders. Perhaps we should call get_order for each known order? But we don't know order IDs. We need list. The tool returned incomplete. Maybe we can call list_orders again. Let's try again.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-92872ecd5f5b9f36",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 4,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C011"
+          },
+          "raw_arguments": "{\"customer_id\": \"C011\"}",
+          "result": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�",
+          "ok": false,
+          "fault": "malformed",
+          "error": "malformed",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 5,
+      "latency_s": 1.209,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 793,
+        "completion_tokens": 73,
+        "reasoning_tokens": 57,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The function output seems garbled. It returned some weird characters. Maybe the API returned binary? We might need to retry? The list_orders function may have a bug. We might need to re-call with correct arguments. Let's try again.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-ae736c0b67236571",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 5,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C011"
+          },
+          "raw_arguments": "{\"customer_id\": \"C011\"}",
+          "result": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�",
+          "ok": false,
+          "fault": "malformed",
+          "error": "malformed",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 6,
+      "latency_s": 3.721,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 845,
+        "completion_tokens": 243,
+        "reasoning_tokens": 251,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The list_orders responses are corrupted: each has \"id\": \"\u0000�\" etc. Possibly the function is returning incomplete data or an error. We need to handle this gracefully. We should try again? Maybe there's a bug. We can try to call list_orders again, but we might get same result. Alternatively, we could call search_kb to get policy or something? But the user wants list of orders and statuses. We need to fetch them. The list_orders function is broken. We could try to fetch each order individually? But we don't know order IDs. We could attempt to call search_kb for \"orders list\" but that won't give specific orders.\n\nMaybe the function output is truncated due to formatting issues. Could be that the JSON is not parsed correctly. The \"id\" values are weird. Possibly the function returns binary or something. We could try to parse manually? But we can't.\n\nWe could ask the user for clarification or ask to try again. But we should try to get the orders. Maybe we can call list_orders again. Let's try again.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-90ce77738227c14c",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 6,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C011"
+          },
+          "raw_arguments": "{\"customer_id\": \"C011\"}",
+          "result": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�",
+          "ok": false,
+          "fault": "malformed",
+          "error": "malformed",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 7,
+      "latency_s": 15.421,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 897,
+        "completion_tokens": 970,
+        "reasoning_tokens": 1016,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I’m having trouble pulling your order list right now. Could you please share the order numbers you’d like to see, or let me know if you’d like me to list them all again? I’ll get the details for you as soon as I can.",
+        "reasoning": "The list_orders function seems to be returning corrupted data. It shows weird characters. Might be a bug. Let's attempt to get a single order maybe. But the user wants all orders. Let's try to get order details by known order ID? We don't know order IDs. Could we ask user for order ID? But we need to list all orders. The list_orders function returned corrupted data. Might be a bug. We can try to call list_orders again? It keeps returning corrupted data. Maybe the function returns binary? Let's interpret the data. The \"list_orders\" array contains one element with \"id\": \"\u0000�\". That seems like a truncated string. Maybe the function is not working. We can try to call get_order with a known order ID? We don't have one. Could we search the knowledge base? The user asked: \"Please list all my orders and their statuses.\" We need to provide a list. We cannot fabricate. The function is not giving proper data. We could try to call search_kb to see if there's an article about listing orders. But that might not help. We might need to ask the user for clarification. But we can try to call list_orders with correct parameters. The function signature is list_orders({_:\"customer_id\": string}). We used that. It returned corrupted. Maybe we need to specify the correct format? The function expects a JSON with \"customer_id\". We passed that. The output is corrupted. Maybe the system has a bug. We could try to call get_order for a known order ID? We don't have one. Could ask the user to provide an order ID. But we can also try to call search_kb to see if there's an article about listing orders. But the user wants a list. We might need to ask the user to provide order IDs. But we can also try to call list_orders with a different customer_id? No. The customer_id is correct. The data is corrupted. Maybe we need to decode? The \"id\" is \"\u0000�\". That is a single character? Possibly the function returned a binary string? Could be that the order ID is something like \"ORD-1001\" but truncated. The corrupted output might be due to encoding. We might need to interpret the data. But we can't guess. The policy says never invent order details. So we cannot provide a list. We should ask the user to provide the order IDs or ask them to retry? We could ask the user to re-check? But we can also try to use search_kb to find a relevant article about \"list orders\". But that wouldn't provide the actual orders. The best approach is to ask the user for clarification: \"I couldn't retrieve your orders due to a system issue. Could you provide your order IDs?\" But maybe we can try to call get_order for a known order ID? We don't know. Maybe we can ask the user: \"Could you tell me which order(s) you'd like to see?\" But the user asked all orders. We might have to ask them to provide more info.\n\nAlternatively, maybe we can parse the corrupted data. The \"id\" field seems to be a single character \"\u0000\". That might be the start of a string. The next character is \"�\". This might be a binary representation of \"ORD-\". But it's truncated. The function might be returning something like \"ORD-1001\" but encoded incorrectly. Could we interpret it? The string \"\u0000\" is null, \"�\" is replacement character. This might indicate that the data is not valid UTF-8. We can't rely on it. We should not fabricate. So best to ask the user: \"I’m having trouble retrieving your order list. Could you please provide your order IDs or confirm your account details?\" But we already have account details. We can ask for clarification: \"Could you please provide the order numbers you want to see?\" But the user wants all orders.\n\nWe could attempt to call search_kb to see if there's an article about \"list orders\". That might give instructions. But the user wants the list. We can't provide it. So we should ask the user to provide the order IDs or we can ask them to re-check. We can also ask them to confirm their account. But we already have it.\n\nThus the best answer: Apologize and ask them to provide the order IDs or to try again. But we can also ask them to provide the order IDs. Let's do that.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I’m having trouble pulling your order list right now. Could you please share the order numbers you’d like to see, or let me know if you’d like me to list them all again? I’ll get the details for you as soon as I can.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: keiko.tanaka@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "Please list all my orders and their statuses."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-80d456a7759945b2",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\": \"keiko.tanaka@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-80d456a7759945b2",
+      "content": "{\"customer_id\": \"C011\", \"name\": \"Keiko Tanaka\", \"email\": \"keiko.tanaka@example.com\", \"phone\": \"555-0111\", \"address\": \"14 Sakura Ln, San Jose, CA 95112\", \"tier\": \"standard\", \"member_since\": \"2023-10-10\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-bf2cd4cc96659303",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bf2cd4cc96659303",
+      "content": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-9df90e8a91d2460e",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9df90e8a91d2460e",
+      "content": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-92872ecd5f5b9f36",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-92872ecd5f5b9f36",
+      "content": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-ae736c0b67236571",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ae736c0b67236571",
+      "content": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-90ce77738227c14c",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C011\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-90ce77738227c14c",
+      "content": "{\"status\": \"ok\", \"data\": {\"list_orders\": [{\"id\": \"\u0000�"
+    },
+    {
+      "role": "assistant",
+      "content": "I’m having trouble pulling your order list right now. Could you please share the order numbers you’d like to see, or let me know if you’d like me to list them all again? I’ll get the details for you as soon as I can."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 5130,
+    "completion_tokens": 1614,
+    "reasoning_tokens": 1566
+  },
+  "llm_latency_s": 28.197,
+  "wall_time_s": 33.995,
+  "retries": 0,
+  "trial": 3,
+  "category": "tool_failure",
+  "pass": false,
+  "failed_checks": [
+    "expected_tool_calls: missing escalate_to_human()",
+    "expected_state: escalated expected True got False"
+  ],
+  "failure_tags": [
+    "no_recovery_from_tool_error"
+  ],
+  "expected": {
+    "must_contain": [],
+    "must_not_contain": [
+      "ORD-1020",
+      "ORD-1021",
+      {
+        "any_of": [
+          "tablet sleeve",
+          "stylus pen"
+        ]
+      }
+    ],
+    "expected_tool_calls": [
+      {
+        "name": "list_orders",
+        "args": {
+          "customer_id": "C011"
+        }
+      },
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": true
+    },
+    "max_steps": 8
+  },
+  "fault_injection": [
+    {
+      "tool": "list_orders",
+      "type": "malformed",
+      "on_call": "all"
+    }
+  ]
+}

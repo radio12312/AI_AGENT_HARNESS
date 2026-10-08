@@ -1,0 +1,162 @@
+{
+  "case_id": "edge_01_ambiguous_refund",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [
+    "kb_grounding"
+  ],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: olivia.rossi@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "I want a refund for my order."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 3.258,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 527,
+        "completion_tokens": 111,
+        "reasoning_tokens": 87,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to get the customer's order. The user says \"I want a refund for my order.\" We need to ask for order ID? But we can search their orders. We can list orders for customer ID. We need to find their customer ID. We have email: olivia.rossi@example.com. We can call get_customer? There's get_customer function. Let's call get_customer with email.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-b99e049c0b887988",
+            "name": "get_customer",
+            "arguments": "{\"email\": \"olivia.rossi@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "olivia.rossi@example.com"
+          },
+          "raw_arguments": "{\"email\": \"olivia.rossi@example.com\"}",
+          "result": "{\"customer_id\": \"C015\", \"name\": \"Olivia Rossi\", \"email\": \"olivia.rossi@example.com\", \"phone\": \"555-0115\", \"address\": \"77 Vine St, Brooklyn, NY 11201\", \"tier\": \"standard\", \"member_since\": \"2024-02-28\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 1.821,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 634,
+        "completion_tokens": 106,
+        "reasoning_tokens": 58,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Sure! Could you please let me know the order ID (e.g., ORD‑1234) you’d like to refund? That way I can check its details and see if it qualifies for a refund.",
+        "reasoning": "We have customer data. Customer wants a refund for an order. Need to know which order. We should ask for order ID. Then check order details: delivered within 30 days, amount <=200. We must issue refund if eligible. So ask for order ID.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Sure! Could you please let me know the order ID (e.g., ORD‑1234) you’d like to refund? That way I can check its details and see if it qualifies for a refund.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: olivia.rossi@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "I want a refund for my order."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-b99e049c0b887988",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\": \"olivia.rossi@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b99e049c0b887988",
+      "content": "{\"customer_id\": \"C015\", \"name\": \"Olivia Rossi\", \"email\": \"olivia.rossi@example.com\", \"phone\": \"555-0115\", \"address\": \"77 Vine St, Brooklyn, NY 11201\", \"tier\": \"standard\", \"member_since\": \"2024-02-28\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "Sure! Could you please let me know the order ID (e.g., ORD‑1234) you’d like to refund? That way I can check its details and see if it qualifies for a refund."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1161,
+    "completion_tokens": 217,
+    "reasoning_tokens": 145
+  },
+  "llm_latency_s": 5.079,
+  "wall_time_s": 5.079,
+  "retries": 0,
+  "trial": 5,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      {
+        "any_of": [
+          "which order",
+          "which of",
+          "which one",
+          "order number",
+          "order id",
+          "specify",
+          "clarify",
+          "let me know"
+        ]
+      }
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": []
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

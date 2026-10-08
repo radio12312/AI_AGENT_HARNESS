@@ -1,0 +1,261 @@
+{
+  "case_id": "edge_05_refund_exactly_30_days",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: emma.schultz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "My HD webcam from order ORD-1008 stopped working. Can I get a refund?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 3.767,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 1.36
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 3.49
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 939,
+        "completion_tokens": 119,
+        "reasoning_tokens": 89,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer is asking about a refund for an HD webcam from order ORD-1008. First, I need to check the order details to see if it's eligible for a refund according to policy: refunds only for orders delivered within the last 30 days, max $200. Also need to verify the customer is authenticated (emma.schultz@example.com). I should get the order details first.",
+        "tool_calls": [
+          {
+            "id": "call-b4492dfc-8c9e-498b-9223-ce7eaf6b5bc8",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1008\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1008"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-1008\"}",
+          "result": "{\"order_id\": \"ORD-1008\", \"customer_id\": \"C005\", \"order_date\": \"2026-08-26\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-CAM-08\", \"name\": \"HD Webcam\", \"qty\": 1, \"unit_price\": 75.0}], \"total\": 75.0, \"delivered_on\": \"2026-08-31\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450008\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 30.995,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.16
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 3.37
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1142,
+        "completion_tokens": 350,
+        "reasoning_tokens": 235,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The order ORD-1008 was delivered on 2026-08-31. Today is 2026-09-30. That's 30 days exactly? Let's calculate: August has 31 days. From Aug 31 to Sep 30 is 30 days. The policy says refunds allowed only for orders delivered within the last 30 days. Since delivered on Aug 31, today is Sep 30, that's exactly 30 days. Usually \"within the last 30 days\" includes the 30th day? Might be inclusive. But we need to check if it's within 30 days. The policy: \"Refunds are allowed only for orders delivered within the last 30 days.\" If delivered on Aug 31, then 30 days later is Sep 30. So it's within 30 days. The total is $75, which is under $200 limit. No previous refunds. So we can issue a refund. Need to ask for reason? The customer says \"stopped working\". That's a defect. We can issue refund. We'll need to call issue_refund with order_id, amount, reason. Amount should be $75 (full refund). Reason: \"HD webcam stopped working\". Let's do that.",
+        "tool_calls": [
+          {
+            "id": "call-105ea8ad-2cf5-496e-8955-a3b86e67cb69",
+            "name": "issue_refund",
+            "arguments": "{\"amount\":75,\"order_id\":\"ORD-1008\",\"reason\":\"HD webcam stopped working\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "issue_refund",
+          "arguments": {
+            "amount": 75,
+            "order_id": "ORD-1008",
+            "reason": "HD webcam stopped working"
+          },
+          "raw_arguments": "{\"amount\":75,\"order_id\":\"ORD-1008\",\"reason\":\"HD webcam stopped working\"}",
+          "result": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1008\", \"amount\": 75.0, \"status\": \"processed\", \"message\": \"Refund of $75.00 issued to the original payment method (5-7 business days).\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 8.734,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 1.86
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1282,
+        "completion_tokens": 94,
+        "reasoning_tokens": 24,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I've processed a refund of **$75.00** for your HD webcam from order ORD-1008. The refund has been issued to your original payment method and should appear in your account within 5–7 business days. The refund ID is **RF-1002**.\n\nIs there anything else I can help you with?",
+        "reasoning": "The refund has been successfully processed. I should inform the customer about the refund details.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I've processed a refund of **$75.00** for your HD webcam from order ORD-1008. The refund has been issued to your original payment method and should appear in your account within 5–7 business days. The refund ID is **RF-1002**.\n\nIs there anything else I can help you with?",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: emma.schultz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "My HD webcam from order ORD-1008 stopped working. Can I get a refund?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-b4492dfc-8c9e-498b-9223-ce7eaf6b5bc8",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1008\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-b4492dfc-8c9e-498b-9223-ce7eaf6b5bc8",
+      "content": "{\"order_id\": \"ORD-1008\", \"customer_id\": \"C005\", \"order_date\": \"2026-08-26\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-CAM-08\", \"name\": \"HD Webcam\", \"qty\": 1, \"unit_price\": 75.0}], \"total\": 75.0, \"delivered_on\": \"2026-08-31\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450008\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-105ea8ad-2cf5-496e-8955-a3b86e67cb69",
+          "type": "function",
+          "function": {
+            "name": "issue_refund",
+            "arguments": "{\"amount\":75,\"order_id\":\"ORD-1008\",\"reason\":\"HD webcam stopped working\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-105ea8ad-2cf5-496e-8955-a3b86e67cb69",
+      "content": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1008\", \"amount\": 75.0, \"status\": \"processed\", \"message\": \"Refund of $75.00 issued to the original payment method (5-7 business days).\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I've processed a refund of **$75.00** for your HD webcam from order ORD-1008. The refund has been issued to your original payment method and should appear in your account within 5–7 business days. The refund ID is **RF-1002**.\n\nIs there anything else I can help you with?"
+    }
+  ],
+  "final_state": {
+    "refunds": [
+      {
+        "order_id": "ORD-1008",
+        "amount": 75.0
+      }
+    ],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 3363,
+    "completion_tokens": 563,
+    "reasoning_tokens": 348
+  },
+  "llm_latency_s": 43.496,
+  "wall_time_s": 61.997,
+  "retries": 5,
+  "trial": 5,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "75"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1008"
+        }
+      },
+      {
+        "name": "issue_refund",
+        "args": {
+          "order_id": "ORD-1008",
+          "amount": 75.0
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "expected_state": {
+      "refunds": [
+        {
+          "order_id": "ORD-1008",
+          "amount": 75.0
+        }
+      ],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

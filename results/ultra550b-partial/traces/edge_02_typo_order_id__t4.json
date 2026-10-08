@@ -1,0 +1,369 @@
+{
+  "case_id": "edge_02_typo_order_id",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 8,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you check the status of my order ORD-1O01? It was a wireless mouse."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 11.359,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 940,
+        "completion_tokens": 188,
+        "reasoning_tokens": 136,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer is asking about order ORD-1O01 (note the letter O instead of zero). They mentioned it was a wireless mouse. I need to check the order status. First, I should verify the order ID format. The customer wrote \"ORD-1O01\" with an O, but order IDs typically use zeros. It might be ORD-1001. I should use get_order with the exact ID they provided, but if it fails, I might need to try ORD-1001. However, the tool requires an order_id parameter. I'll try with ORD-1O01 first. If it returns an error, I'll try ORD-1001. Let's call get_order.",
+        "tool_calls": [
+          {
+            "id": "call-5321741c-e0dc-4b2d-8116-91d24aaf38bb",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1O01\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1O01"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-1O01\"}",
+          "result": "{\"error\": \"not_found\", \"message\": \"No order with id ORD-1O01\"}",
+          "ok": false,
+          "fault": null,
+          "error": "not_found",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 4.149,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.18
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1009,
+        "completion_tokens": 101,
+        "reasoning_tokens": 56,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The order ID ORD-1O01 was not found. The user might have made a typo - \"ORD-1O01\" uses letter O instead of zero. Let me check if there's an order ORD-1001 (with zero). First, let me get the customer info to see their orders.",
+        "tool_calls": [
+          {
+            "id": "call-04cd210b-b3ec-48c1-b59e-fdfafef475f9",
+            "name": "get_customer",
+            "arguments": "{\"email\":\"alice.nguyen@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "get_customer",
+          "arguments": {
+            "email": "alice.nguyen@example.com"
+          },
+          "raw_arguments": "{\"email\":\"alice.nguyen@example.com\"}",
+          "result": "{\"customer_id\": \"C001\", \"name\": \"Alice Nguyen\", \"email\": \"alice.nguyen@example.com\", \"phone\": \"555-0101\", \"address\": \"12 Birch Lane, Portland, OR 97205\", \"tier\": \"gold\", \"member_since\": \"2023-02-11\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 3.879,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.42
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1143,
+        "completion_tokens": 97,
+        "reasoning_tokens": 60,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer ID is C001. Let me list their orders to find the correct order ID for the wireless mouse. The customer mentioned ORD-1O01 (with letter O), but the system didn't find it. It might be ORD-1001 (with zero). Let me check their orders.",
+        "tool_calls": [
+          {
+            "id": "call-037d51ca-f09b-413e-80cb-58283ec6b0cf",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\":\"C001\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 3,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C001"
+          },
+          "raw_arguments": "{\"customer_id\":\"C001\"}",
+          "result": "{\"customer_id\": \"C001\", \"orders\": [{\"order_id\": \"ORD-1001\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"total\": 49.99}, {\"order_id\": \"ORD-1002\", \"order_date\": \"2026-09-26\", \"status\": \"shipped\", \"total\": 129.0}], \"count\": 2}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 4,
+      "latency_s": 4.158,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1298,
+        "completion_tokens": 89,
+        "reasoning_tokens": 48,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer mentioned order ORD-1O01 (with letter O), but the actual order ID appears to be ORD-1001 (with zero). Let me check the details of ORD-1001 to see if it's the wireless mouse order.",
+        "tool_calls": [
+          {
+            "id": "call-073140ee-9207-4cbe-8b7f-cd35bc751b90",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1001\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 4,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1001"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-1001\"}",
+          "result": "{\"order_id\": \"ORD-1001\", \"customer_id\": \"C001\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-MSE-01\", \"name\": \"Wireless Mouse\", \"qty\": 1, \"unit_price\": 49.99}], \"total\": 49.99, \"delivered_on\": \"2026-09-20\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123456781\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 5,
+      "latency_s": 13.841,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.12
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 2.45
+        },
+        {
+          "attempt": 3,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 6.32
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1503,
+        "completion_tokens": 237,
+        "reasoning_tokens": 50,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I found your order! It looks like the order ID is **ORD-1001** (with zeros, not the letter O). Here are the details:\n\n**Order ORD-1001**\n- **Status:** Delivered\n- **Order Date:** September 15, 2026\n- **Delivered On:** September 20, 2026\n- **Item:** Wireless Mouse (SKU-MSE-01) × 1\n- **Total:** $49.99\n- **Carrier:** UPS\n- **Tracking Number:** 1Z999AA10123456781\n\nThe wireless mouse was delivered on September 20, 2026. Is there anything else you'd like to know about this order?",
+        "reasoning": "The customer asked about order ORD-1O01 (with letter O instead of zero). I found their actual order ORD-1001 which is a wireless mouse delivered on 2026-09-20. I should provide the status and details.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I found your order! It looks like the order ID is **ORD-1001** (with zeros, not the letter O). Here are the details:\n\n**Order ORD-1001**\n- **Status:** Delivered\n- **Order Date:** September 15, 2026\n- **Delivered On:** September 20, 2026\n- **Item:** Wireless Mouse (SKU-MSE-01) × 1\n- **Total:** $49.99\n- **Carrier:** UPS\n- **Tracking Number:** 1Z999AA10123456781\n\nThe wireless mouse was delivered on September 20, 2026. Is there anything else you'd like to know about this order?",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you check the status of my order ORD-1O01? It was a wireless mouse."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-5321741c-e0dc-4b2d-8116-91d24aaf38bb",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1O01\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-5321741c-e0dc-4b2d-8116-91d24aaf38bb",
+      "content": "{\"error\": \"not_found\", \"message\": \"No order with id ORD-1O01\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-04cd210b-b3ec-48c1-b59e-fdfafef475f9",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\":\"alice.nguyen@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-04cd210b-b3ec-48c1-b59e-fdfafef475f9",
+      "content": "{\"customer_id\": \"C001\", \"name\": \"Alice Nguyen\", \"email\": \"alice.nguyen@example.com\", \"phone\": \"555-0101\", \"address\": \"12 Birch Lane, Portland, OR 97205\", \"tier\": \"gold\", \"member_since\": \"2023-02-11\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-037d51ca-f09b-413e-80cb-58283ec6b0cf",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\":\"C001\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-037d51ca-f09b-413e-80cb-58283ec6b0cf",
+      "content": "{\"customer_id\": \"C001\", \"orders\": [{\"order_id\": \"ORD-1001\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"total\": 49.99}, {\"order_id\": \"ORD-1002\", \"order_date\": \"2026-09-26\", \"status\": \"shipped\", \"total\": 129.0}], \"count\": 2}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-073140ee-9207-4cbe-8b7f-cd35bc751b90",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1001\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-073140ee-9207-4cbe-8b7f-cd35bc751b90",
+      "content": "{\"order_id\": \"ORD-1001\", \"customer_id\": \"C001\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-MSE-01\", \"name\": \"Wireless Mouse\", \"qty\": 1, \"unit_price\": 49.99}], \"total\": 49.99, \"delivered_on\": \"2026-09-20\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123456781\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "I found your order! It looks like the order ID is **ORD-1001** (with zeros, not the letter O). Here are the details:\n\n**Order ORD-1001**\n- **Status:** Delivered\n- **Order Date:** September 15, 2026\n- **Delivered On:** September 20, 2026\n- **Item:** Wireless Mouse (SKU-MSE-01) × 1\n- **Total:** $49.99\n- **Carrier:** UPS\n- **Tracking Number:** 1Z999AA10123456781\n\nThe wireless mouse was delivered on September 20, 2026. Is there anything else you'd like to know about this order?"
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 5893,
+    "completion_tokens": 712,
+    "reasoning_tokens": 350
+  },
+  "llm_latency_s": 37.388,
+  "wall_time_s": 62.064,
+  "retries": 5,
+  "trial": 4,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "ORD-1001",
+      "delivered"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "any_of": [
+          {
+            "name": "get_order",
+            "args": {
+              "order_id": "ORD-1001"
+            }
+          },
+          {
+            "name": "list_orders",
+            "args": {
+              "customer_id": "C001"
+            }
+          }
+        ]
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 8
+  },
+  "fault_injection": null
+}

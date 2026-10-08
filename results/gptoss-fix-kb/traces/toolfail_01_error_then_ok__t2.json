@@ -1,0 +1,234 @@
+{
+  "case_id": "toolfail_01_error_then_ok",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [
+    "kb_grounding"
+  ],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "Has my order ORD-1001 been delivered yet?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 1.271,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 528,
+        "completion_tokens": 40,
+        "reasoning_tokens": 12,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to look up order details. Use get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-9af69c230102ca0b",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1001\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1001"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1001\"}",
+          "result": "{\"error\": \"service_unavailable\", \"message\": \"503 Service Unavailable: the backend for get_order is temporarily unavailable.\"}",
+          "ok": false,
+          "fault": "error",
+          "error": "error",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 1.429,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 590,
+        "completion_tokens": 52,
+        "reasoning_tokens": 29,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to handle service_unavailable. According to policy, we should probably retry or inform user. We can try again.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-9e5247f8735a3f02",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1001\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1001"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1001\"}",
+          "result": "{\"order_id\": \"ORD-1001\", \"customer_id\": \"C001\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-MSE-01\", \"name\": \"Wireless Mouse\", \"qty\": 1, \"unit_price\": 49.99}], \"total\": 49.99, \"delivered_on\": \"2026-09-20\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123456781\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 2.527,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 750,
+        "completion_tokens": 104,
+        "reasoning_tokens": 46,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Yes, your order **ORD-1001** was delivered on **September 20, 2026**. If you have any questions about the shipment or need anything else, just let me know!",
+        "reasoning": "We need to answer: \"Has my order ORD-1001 been delivered yet?\" We have order details: status delivered, delivered_on 2026-09-20. Today is 2026-09-30. So yes, delivered. Provide answer.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Yes, your order **ORD-1001** was delivered on **September 20, 2026**. If you have any questions about the shipment or need anything else, just let me know!",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "Has my order ORD-1001 been delivered yet?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-9af69c230102ca0b",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1001\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9af69c230102ca0b",
+      "content": "{\"error\": \"service_unavailable\", \"message\": \"503 Service Unavailable: the backend for get_order is temporarily unavailable.\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-9e5247f8735a3f02",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1001\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9e5247f8735a3f02",
+      "content": "{\"order_id\": \"ORD-1001\", \"customer_id\": \"C001\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-MSE-01\", \"name\": \"Wireless Mouse\", \"qty\": 1, \"unit_price\": 49.99}], \"total\": 49.99, \"delivered_on\": \"2026-09-20\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123456781\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "Yes, your order **ORD-1001** was delivered on **September 20, 2026**. If you have any questions about the shipment or need anything else, just let me know!"
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1868,
+    "completion_tokens": 196,
+    "reasoning_tokens": 87
+  },
+  "llm_latency_s": 5.226,
+  "wall_time_s": 7.662,
+  "retries": 0,
+  "trial": 2,
+  "category": "tool_failure",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "delivered",
+      {
+        "any_of": [
+          "2026-09-20",
+          "september 20",
+          "sept 20",
+          "sep 20",
+          "20 september",
+          "9/20",
+          "september 20th"
+        ]
+      }
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1001"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": [
+    {
+      "tool": "get_order",
+      "type": "error",
+      "on_call": 1
+    }
+  ]
+}

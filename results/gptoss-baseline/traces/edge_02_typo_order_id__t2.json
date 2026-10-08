@@ -1,0 +1,232 @@
+{
+  "case_id": "edge_02_typo_order_id",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps": 8,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you check the status of my order ORD-1O01? It was a wireless mouse."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 2.9,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 499,
+        "completion_tokens": 40,
+        "reasoning_tokens": 11,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to check order status. Use get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-99f83b4b31006a0b",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1O01\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1O01"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1O01\"}",
+          "result": "{\"error\": \"not_found\", \"message\": \"No order with id ORD-1O01\"}",
+          "ok": false,
+          "fault": null,
+          "error": "not_found",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 5.073,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 556,
+        "completion_tokens": 88,
+        "reasoning_tokens": 59,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to respond that order not found. But maybe it's a typo? Could be ORD-1001? The user typed ORD-1O01 (1 O 01). Could be 1001. We should ask for clarification. Also we can search for order list. Let's list orders for this customer.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-b314cadf26217ec2",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C001\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C001"
+          },
+          "raw_arguments": "{\"customer_id\": \"C001\"}",
+          "result": "{\"customer_id\": \"C001\", \"orders\": [{\"order_id\": \"ORD-1001\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"total\": 49.99}, {\"order_id\": \"ORD-1002\", \"order_date\": \"2026-09-26\", \"status\": \"shipped\", \"total\": 129.0}], \"count\": 2}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 15.186,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "APITimeoutError: Request timed out.",
+          "sleep_s": 1.24
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 680,
+        "completion_tokens": 250,
+        "reasoning_tokens": 110,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I’m sorry, but I couldn’t find an order with the ID **ORD-1O01** in your account. The most recent orders you’ve placed are:\n\n| Order ID | Order Date | Status   | Total |\n|----------|------------|----------|-------|\n| ORD-1001 | 2026‑09‑15 | Delivered | $49.99 |\n| ORD-1002 | 2026‑09‑26 | Shipped   | $129.00 |\n\nIf you meant one of these orders or have a different ID, just let me know and I’ll look it up for you.",
+        "reasoning": "We need to respond. The user asked for status of order ORD-1O01. That ID doesn't exist. We can check list of orders: we have ORD-1001 delivered on 2026-09-15, total $49.99. Also ORD-1002 shipped on 2026-09-26. So we can explain that order ID is incorrect, or maybe they typed wrong. We can ask for correct ID. Also mention we can provide status of their orders. Provide details. Also ensure not to reveal other customers. Provide plain text.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I’m sorry, but I couldn’t find an order with the ID **ORD-1O01** in your account. The most recent orders you’ve placed are:\n\n| Order ID | Order Date | Status   | Total |\n|----------|------------|----------|-------|\n| ORD-1001 | 2026‑09‑15 | Delivered | $49.99 |\n| ORD-1002 | 2026‑09‑26 | Shipped   | $129.00 |\n\nIf you meant one of these orders or have a different ID, just let me know and I’ll look it up for you.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you check the status of my order ORD-1O01? It was a wireless mouse."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-99f83b4b31006a0b",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1O01\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-99f83b4b31006a0b",
+      "content": "{\"error\": \"not_found\", \"message\": \"No order with id ORD-1O01\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-b314cadf26217ec2",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C001\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b314cadf26217ec2",
+      "content": "{\"customer_id\": \"C001\", \"orders\": [{\"order_id\": \"ORD-1001\", \"order_date\": \"2026-09-15\", \"status\": \"delivered\", \"total\": 49.99}, {\"order_id\": \"ORD-1002\", \"order_date\": \"2026-09-26\", \"status\": \"shipped\", \"total\": 129.0}], \"count\": 2}"
+    },
+    {
+      "role": "assistant",
+      "content": "I’m sorry, but I couldn’t find an order with the ID **ORD-1O01** in your account. The most recent orders you’ve placed are:\n\n| Order ID | Order Date | Status   | Total |\n|----------|------------|----------|-------|\n| ORD-1001 | 2026‑09‑15 | Delivered | $49.99 |\n| ORD-1002 | 2026‑09‑26 | Shipped   | $129.00 |\n\nIf you meant one of these orders or have a different ID, just let me know and I’ll look it up for you."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1735,
+    "completion_tokens": 378,
+    "reasoning_tokens": 180
+  },
+  "llm_latency_s": 23.159,
+  "wall_time_s": 204.935,
+  "retries": 1,
+  "trial": 2,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "ORD-1001",
+      "delivered"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "any_of": [
+          {
+            "name": "get_order",
+            "args": {
+              "order_id": "ORD-1001"
+            }
+          },
+          {
+            "name": "list_orders",
+            "args": {
+              "customer_id": "C001"
+            }
+          }
+        ]
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 8
+  },
+  "fault_injection": null
+}

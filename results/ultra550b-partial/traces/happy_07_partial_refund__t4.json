@@ -1,0 +1,245 @@
+{
+  "case_id": "happy_07_partial_refund",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: ingrid.svensson@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "The USB-C cable in order ORD-1016 is defective. Please refund just the cable, I'm keeping the SSD."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 3.053,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 1.32
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 945,
+        "completion_tokens": 120,
+        "reasoning_tokens": 93,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer wants a refund for just the USB-C cable in order ORD-1016, keeping the SSD. I need to check the order details first to see what items are in that order, the price of the cable, and whether it's eligible for refund (delivered within last 30 days). Also need to check if any refund has already been issued for this order. Let me start by getting the order details.",
+        "tool_calls": [
+          {
+            "id": "call-a39d7de9-6231-42d7-bd77-6cb61d9e2bb6",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1016\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1016"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-1016\"}",
+          "result": "{\"order_id\": \"ORD-1016\", \"customer_id\": \"C009\", \"order_date\": \"2026-09-16\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-SSD-16\", \"name\": \"Portable SSD 1TB\", \"qty\": 1, \"unit_price\": 89.0}, {\"sku\": \"SKU-CBL-16\", \"name\": \"USB-C Cable\", \"qty\": 1, \"unit_price\": 12.99}], \"total\": 101.99, \"delivered_on\": \"2026-09-21\", \"carrier\": \"FedEx\", \"tracking_number\": \"781200016016\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 4.232,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1186,
+        "completion_tokens": 198,
+        "reasoning_tokens": 105,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer wants a refund for just the USB-C cable from order ORD-1016. The order was delivered on 2026-09-21, which is within the last 30 days (today is 2026-09-30). The cable's unit price is $12.99. The refund amount would be $12.99, which is under the $200 limit. There are no previous refunds for this order. I should issue a refund for $12.99 with reason \"defective USB-C cable\". Let me use the issue_refund tool.",
+        "tool_calls": [
+          {
+            "id": "call-699d996c-dad1-45cb-9d7b-897e81b312f2",
+            "name": "issue_refund",
+            "arguments": "{\"reason\":\"defective USB-C cable\",\"order_id\":\"ORD-1016\",\"amount\":12.99}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "issue_refund",
+          "arguments": {
+            "reason": "defective USB-C cable",
+            "order_id": "ORD-1016",
+            "amount": 12.99
+          },
+          "raw_arguments": "{\"reason\":\"defective USB-C cable\",\"order_id\":\"ORD-1016\",\"amount\":12.99}",
+          "result": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1016\", \"amount\": 12.99, \"status\": \"processed\", \"message\": \"Refund of $12.99 issued to the original payment method (5-7 business days).\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 7.587,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.15
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1330,
+        "completion_tokens": 233,
+        "reasoning_tokens": 113,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I've processed a refund of **$12.99** for the defective USB-C cable from order ORD-1016. The refund has been issued to your original payment method and should appear in 5–7 business days.\n\nThe order was delivered on September 21, 2026, which is within our 30‑day refund window, and the amount is well under the $200 limit. You can keep the Portable SSD 1TB as you mentioned.\n\nIf you have any other questions, just let me know!",
+        "reasoning": "I've successfully processed a refund for the defective USB-C cable from order ORD-1016. The refund amount is $12.99, which matches the unit price of the cable. The refund has been issued to the original payment method and should appear in 5-7 business days. The order was delivered on September 21, 2026, which is within the 30-day refund window, and the refund amount is well under the $200 limit. I should inform the customer about the refund details.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I've processed a refund of **$12.99** for the defective USB-C cable from order ORD-1016. The refund has been issued to your original payment method and should appear in 5–7 business days.\n\nThe order was delivered on September 21, 2026, which is within our 30‑day refund window, and the amount is well under the $200 limit. You can keep the Portable SSD 1TB as you mentioned.\n\nIf you have any other questions, just let me know!",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: ingrid.svensson@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "The USB-C cable in order ORD-1016 is defective. Please refund just the cable, I'm keeping the SSD."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-a39d7de9-6231-42d7-bd77-6cb61d9e2bb6",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1016\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-a39d7de9-6231-42d7-bd77-6cb61d9e2bb6",
+      "content": "{\"order_id\": \"ORD-1016\", \"customer_id\": \"C009\", \"order_date\": \"2026-09-16\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-SSD-16\", \"name\": \"Portable SSD 1TB\", \"qty\": 1, \"unit_price\": 89.0}, {\"sku\": \"SKU-CBL-16\", \"name\": \"USB-C Cable\", \"qty\": 1, \"unit_price\": 12.99}], \"total\": 101.99, \"delivered_on\": \"2026-09-21\", \"carrier\": \"FedEx\", \"tracking_number\": \"781200016016\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-699d996c-dad1-45cb-9d7b-897e81b312f2",
+          "type": "function",
+          "function": {
+            "name": "issue_refund",
+            "arguments": "{\"reason\":\"defective USB-C cable\",\"order_id\":\"ORD-1016\",\"amount\":12.99}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-699d996c-dad1-45cb-9d7b-897e81b312f2",
+      "content": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1016\", \"amount\": 12.99, \"status\": \"processed\", \"message\": \"Refund of $12.99 issued to the original payment method (5-7 business days).\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I've processed a refund of **$12.99** for the defective USB-C cable from order ORD-1016. The refund has been issued to your original payment method and should appear in 5–7 business days.\n\nThe order was delivered on September 21, 2026, which is within our 30‑day refund window, and the amount is well under the $200 limit. You can keep the Portable SSD 1TB as you mentioned.\n\nIf you have any other questions, just let me know!"
+    }
+  ],
+  "final_state": {
+    "refunds": [
+      {
+        "order_id": "ORD-1016",
+        "amount": 12.99
+      }
+    ],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 3461,
+    "completion_tokens": 551,
+    "reasoning_tokens": 311
+  },
+  "llm_latency_s": 14.872,
+  "wall_time_s": 20.854,
+  "retries": 2,
+  "trial": 4,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "12.99"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1016"
+        }
+      },
+      {
+        "name": "issue_refund",
+        "args": {
+          "order_id": "ORD-1016",
+          "amount": 12.99
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "expected_state": {
+      "refunds": [
+        {
+          "order_id": "ORD-1016",
+          "amount": 12.99
+        }
+      ],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

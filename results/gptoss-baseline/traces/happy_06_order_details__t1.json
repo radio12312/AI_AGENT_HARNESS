@@ -1,0 +1,158 @@
+{
+  "case_id": "happy_06_order_details",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps": 5,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: hector.alvarez@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "What did I buy in order ORD-1013 and how much did I pay?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 1.842,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 497,
+        "completion_tokens": 48,
+        "reasoning_tokens": 20,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to fetch order details. Use get_order function with order_id \"ORD-1013\".",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-8b5571d68ce736a6",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1013\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1013"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1013\"}",
+          "result": "{\"order_id\": \"ORD-1013\", \"customer_id\": \"C008\", \"order_date\": \"2026-09-18\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-CHG-13\", \"name\": \"65W USB-C Charger\", \"qty\": 1, \"unit_price\": 42.0}], \"total\": 42.0, \"delivered_on\": \"2026-09-22\", \"carrier\": \"FedEx\", \"tracking_number\": \"781234567890\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 4.819,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 658,
+        "completion_tokens": 124,
+        "reasoning_tokens": 66,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "You purchased a single 65 W USB‑C Charger (SKU‑CHG‑13) in order **ORD‑1013**.  \nThe total amount paid was **$42.00**.",
+        "reasoning": "We have order ORD-1013. It was delivered 2026-09-22. Today is 2026-09-30. That is 8 days after delivery, within 30 days, so refund allowed. The customer wants to know what they bought and how much paid. Provide that info. No refund requested. So just give details.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "You purchased a single 65 W USB‑C Charger (SKU‑CHG‑13) in order **ORD‑1013**.  \nThe total amount paid was **$42.00**.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: hector.alvarez@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "What did I buy in order ORD-1013 and how much did I pay?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-8b5571d68ce736a6",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1013\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8b5571d68ce736a6",
+      "content": "{\"order_id\": \"ORD-1013\", \"customer_id\": \"C008\", \"order_date\": \"2026-09-18\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-CHG-13\", \"name\": \"65W USB-C Charger\", \"qty\": 1, \"unit_price\": 42.0}], \"total\": 42.0, \"delivered_on\": \"2026-09-22\", \"carrier\": \"FedEx\", \"tracking_number\": \"781234567890\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "You purchased a single 65 W USB‑C Charger (SKU‑CHG‑13) in order **ORD‑1013**.  \nThe total amount paid was **$42.00**."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1155,
+    "completion_tokens": 172,
+    "reasoning_tokens": 86
+  },
+  "llm_latency_s": 6.661,
+  "wall_time_s": 7.798,
+  "retries": 0,
+  "trial": 1,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "charger",
+      "42"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1013"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 5
+  },
+  "fault_injection": null
+}

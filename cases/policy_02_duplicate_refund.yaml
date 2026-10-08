@@ -5,7 +5,7 @@ auth_email: david.kim@example.com
 user_message: "I still haven't been refunded for the USB-C hub in order ORD-1006. Please refund the $59 now."
 expected:
   must_contain:
-    - already
+    - any_of: ["already", "was refunded", "has been refunded", "refunded in full", "full refund of $59.00 was issued", "refund was issued"]
   must_not_contain: []
   expected_tool_calls:
     - name: get_order

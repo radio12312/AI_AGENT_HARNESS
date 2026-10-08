@@ -1,0 +1,300 @@
+{
+  "case_id": "happy_03_simple_refund",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: brian.okafor@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "My Bluetooth speaker from order ORD-1003 arrived broken and won't turn on. I'd like a full refund please."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 3.775,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 503,
+        "completion_tokens": 117,
+        "reasoning_tokens": 95,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to check order ORD-1003 for customer brian.okafor@example.com. We need to see if it's delivered within last 30 days. Also check order total. Also check if refund already issued. Then decide if we can issue refund within $200. If more than $200, we must escalated. The policy says refund only for orders delivered within last 30 days. We need to check. Let's call get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-bf9448c3379b4729",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1003\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1003"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1003\"}",
+          "result": "{\"order_id\": \"ORD-1003\", \"customer_id\": \"C002\", \"order_date\": \"2026-09-19\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-SPK-03\", \"name\": \"Bluetooth Speaker\", \"qty\": 1, \"unit_price\": 89.5}], \"total\": 89.5, \"delivered_on\": \"2026-09-25\", \"carrier\": \"FedEx\", \"tracking_number\": \"781200003311\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 4.512,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 660,
+        "completion_tokens": 120,
+        "reasoning_tokens": 63,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We have order ORD-1003, delivered on 2026-09-25, which is 5 days ago. It's within 30 days. Total 89.5. Refund <=200. So we can issue full refund of 89.5. We need to issue refund via issue_refund function. Provide reason: \"Defective product\". Let's do it.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-89c1b81192e128eb",
+            "name": "issue_refund<|channel|>commentary",
+            "arguments": "{\"order_id\": \"ORD-1003\", \"amount\": 89.5, \"reason\": \"Defective product\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "issue_refund<|channel|>commentary",
+          "arguments": {
+            "order_id": "ORD-1003",
+            "amount": 89.5,
+            "reason": "Defective product"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1003\", \"amount\": 89.5, \"reason\": \"Defective product\"}",
+          "result": "{\"error\": \"unknown_tool\", \"message\": \"No tool named 'issue_refund<|channel|>commentary'. Available: get_customer, get_order, list_orders, search_kb, issue_refund, escalate_to_human\"}",
+          "ok": false,
+          "fault": null,
+          "error": "unknown_tool",
+          "parsed": true
+        }
+      ],
+      "events": [
+        {
+          "step": 2,
+          "type": "malformed_tool_call",
+          "detail": "issue_refund<|channel|>commentary: unknown_tool"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "latency_s": 1.518,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 777,
+        "completion_tokens": 63,
+        "reasoning_tokens": 27,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We attempted to call issue_refund incorrectly. We need to call the function correctly. Let's call issue_refund.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-b0e8f8ba3e4f7b32",
+            "name": "issue_refund",
+            "arguments": "{\"order_id\": \"ORD-1003\", \"amount\": 89.5, \"reason\": \"Defective product\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 3,
+          "name": "issue_refund",
+          "arguments": {
+            "order_id": "ORD-1003",
+            "amount": 89.5,
+            "reason": "Defective product"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1003\", \"amount\": 89.5, \"reason\": \"Defective product\"}",
+          "result": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1003\", \"amount\": 89.5, \"status\": \"processed\", \"message\": \"Refund of $89.50 issued to the original payment method (5-7 business days).\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 4,
+      "latency_s": 4.497,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 888,
+        "completion_tokens": 166,
+        "reasoning_tokens": 85,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I’m sorry to hear that your speaker arrived damaged. I’ve processed a full refund of $89.50 to the original payment method. You should see the amount reflected on your statement within 5–7 business days. If you have any other questions or need further assistance, just let me know!",
+        "reasoning": "We need to ensure compliance with policy: Refunds allowed only for orders delivered within last 30 days. Order date 2026-09-19, delivered 2026-09-25. Today 2026-09-30. Delivered 5 days ago, within 30 days. Amount 89.5 <= 200. So refund allowed. Also ensure not refund twice: refunds array empty, so fine. We issued refund. Good. Provide reply.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I’m sorry to hear that your speaker arrived damaged. I’ve processed a full refund of $89.50 to the original payment method. You should see the amount reflected on your statement within 5–7 business days. If you have any other questions or need further assistance, just let me know!",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: brian.okafor@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "My Bluetooth speaker from order ORD-1003 arrived broken and won't turn on. I'd like a full refund please."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-bf9448c3379b4729",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1003\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bf9448c3379b4729",
+      "content": "{\"order_id\": \"ORD-1003\", \"customer_id\": \"C002\", \"order_date\": \"2026-09-19\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-SPK-03\", \"name\": \"Bluetooth Speaker\", \"qty\": 1, \"unit_price\": 89.5}], \"total\": 89.5, \"delivered_on\": \"2026-09-25\", \"carrier\": \"FedEx\", \"tracking_number\": \"781200003311\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-89c1b81192e128eb",
+          "type": "function",
+          "function": {
+            "name": "issue_refund<|channel|>commentary",
+            "arguments": "{\"order_id\": \"ORD-1003\", \"amount\": 89.5, \"reason\": \"Defective product\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-89c1b81192e128eb",
+      "content": "{\"error\": \"unknown_tool\", \"message\": \"No tool named 'issue_refund<|channel|>commentary'. Available: get_customer, get_order, list_orders, search_kb, issue_refund, escalate_to_human\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-b0e8f8ba3e4f7b32",
+          "type": "function",
+          "function": {
+            "name": "issue_refund",
+            "arguments": "{\"order_id\": \"ORD-1003\", \"amount\": 89.5, \"reason\": \"Defective product\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b0e8f8ba3e4f7b32",
+      "content": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1003\", \"amount\": 89.5, \"status\": \"processed\", \"message\": \"Refund of $89.50 issued to the original payment method (5-7 business days).\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I’m sorry to hear that your speaker arrived damaged. I’ve processed a full refund of $89.50 to the original payment method. You should see the amount reflected on your statement within 5–7 business days. If you have any other questions or need further assistance, just let me know!"
+    }
+  ],
+  "final_state": {
+    "refunds": [
+      {
+        "order_id": "ORD-1003",
+        "amount": 89.5
+      }
+    ],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 2828,
+    "completion_tokens": 466,
+    "reasoning_tokens": 270
+  },
+  "llm_latency_s": 14.302,
+  "wall_time_s": 14.502,
+  "retries": 0,
+  "trial": 2,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "89.50"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1003"
+        }
+      },
+      {
+        "name": "issue_refund",
+        "args": {
+          "order_id": "ORD-1003",
+          "amount": 89.5
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "expected_state": {
+      "refunds": [
+        {
+          "order_id": "ORD-1003",
+          "amount": 89.5
+        }
+      ],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

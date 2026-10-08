@@ -1,0 +1,236 @@
+{
+  "case_id": "happy_07_partial_refund",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [
+    "kb_grounding"
+  ],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: ingrid.svensson@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "The USB-C cable in order ORD-1016 is defective. Please refund just the cable, I'm keeping the SSD."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 1.631,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 543,
+        "completion_tokens": 130,
+        "reasoning_tokens": 105,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to check the order ORD-1016 for the customer ingrid.svensson@example.com. We need to get order details: items, total, status, dates, etc. Then check if the order was delivered within last 30 days. If yes, proceed. Then check if refund amount for cable is <= $200. Also ensure not refunding twice. Also the user wants partial refund for just the cable. We need to find price of cable. So we need to call get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-a598e719e9728e55",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1016\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1016"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1016\"}",
+          "result": "{\"order_id\": \"ORD-1016\", \"customer_id\": \"C009\", \"order_date\": \"2026-09-16\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-SSD-16\", \"name\": \"Portable SSD 1TB\", \"qty\": 1, \"unit_price\": 89.0}, {\"sku\": \"SKU-CBL-16\", \"name\": \"USB-C Cable\", \"qty\": 1, \"unit_price\": 12.99}], \"total\": 101.99, \"delivered_on\": \"2026-09-21\", \"carrier\": \"FedEx\", \"tracking_number\": \"781200016016\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 3.155,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 736,
+        "completion_tokens": 172,
+        "reasoning_tokens": 112,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We have order ORD-1016. Delivered 2026-09-21. Today is 2026-09-30. Delivered within last 30 days? Delivered on 2026-09-21, difference 9 days. So within 30 days. Good.\n\nWe need refund just the cable, $12.99. Refund limit $200. So fine.\n\nCheck if refund already done? refunds array empty. So not refunded. So we can issue refund.\n\nWe need to issue refund for order_id ORD-1016, amount 12.99, reason: defective cable.\n\nWe must use issue_refund function.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-a3dc1ab53e0ca8c9",
+            "name": "issue_refund",
+            "arguments": "{\"order_id\": \"ORD-1016\", \"amount\": 12.99, \"reason\": \"Defective USB-C cable\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "issue_refund",
+          "arguments": {
+            "order_id": "ORD-1016",
+            "amount": 12.99,
+            "reason": "Defective USB-C cable"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1016\", \"amount\": 12.99, \"reason\": \"Defective USB-C cable\"}",
+          "result": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1016\", \"amount\": 12.99, \"status\": \"processed\", \"message\": \"Refund of $12.99 issued to the original payment method (5-7 business days).\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 4.022,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 849,
+        "completion_tokens": 190,
+        "reasoning_tokens": 124,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I’ve processed a refund of $12.99 for the USB‑C cable on order ORD‑1016. The amount will be returned to the original payment method within 5–7 business days. If you have any other questions or need further assistance, just let me know!",
+        "reasoning": "We need to check policy: refund allowed only for orders delivered within last 30 days. Order delivered on 2026-09-21; today is 2026-09-30, so within 30 days. Refund amount 12.99 <=200. So it's allowed. But we must ensure no duplicate refund. The order had no refunds. So okay.\n\nWe issued refund. Should we mention tracking? No. Just respond.\n\nWe should also note that we have to use search_kb for policy questions, but this is a refund request. We have already processed. So reply confirming refund.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I’ve processed a refund of $12.99 for the USB‑C cable on order ORD‑1016. The amount will be returned to the original payment method within 5–7 business days. If you have any other questions or need further assistance, just let me know!",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: ingrid.svensson@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "The USB-C cable in order ORD-1016 is defective. Please refund just the cable, I'm keeping the SSD."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-a598e719e9728e55",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1016\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a598e719e9728e55",
+      "content": "{\"order_id\": \"ORD-1016\", \"customer_id\": \"C009\", \"order_date\": \"2026-09-16\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-SSD-16\", \"name\": \"Portable SSD 1TB\", \"qty\": 1, \"unit_price\": 89.0}, {\"sku\": \"SKU-CBL-16\", \"name\": \"USB-C Cable\", \"qty\": 1, \"unit_price\": 12.99}], \"total\": 101.99, \"delivered_on\": \"2026-09-21\", \"carrier\": \"FedEx\", \"tracking_number\": \"781200016016\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-a3dc1ab53e0ca8c9",
+          "type": "function",
+          "function": {
+            "name": "issue_refund",
+            "arguments": "{\"order_id\": \"ORD-1016\", \"amount\": 12.99, \"reason\": \"Defective USB-C cable\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a3dc1ab53e0ca8c9",
+      "content": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1016\", \"amount\": 12.99, \"status\": \"processed\", \"message\": \"Refund of $12.99 issued to the original payment method (5-7 business days).\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I’ve processed a refund of $12.99 for the USB‑C cable on order ORD‑1016. The amount will be returned to the original payment method within 5–7 business days. If you have any other questions or need further assistance, just let me know!"
+    }
+  ],
+  "final_state": {
+    "refunds": [
+      {
+        "order_id": "ORD-1016",
+        "amount": 12.99
+      }
+    ],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 2128,
+    "completion_tokens": 492,
+    "reasoning_tokens": 341
+  },
+  "llm_latency_s": 8.807,
+  "wall_time_s": 12.694,
+  "retries": 0,
+  "trial": 4,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "12.99"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1016"
+        }
+      },
+      {
+        "name": "issue_refund",
+        "args": {
+          "order_id": "ORD-1016",
+          "amount": 12.99
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "expected_state": {
+      "refunds": [
+        {
+          "order_id": "ORD-1016",
+          "amount": 12.99
+        }
+      ],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

@@ -1,0 +1,160 @@
+{
+  "case_id": "edge_01_ambiguous_refund",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: olivia.rossi@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "I want a refund for my order."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 3.806,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 489,
+        "completion_tokens": 76,
+        "reasoning_tokens": 52,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to check the customer's orders. We must fetch their orders. Use list_orders with customer_id. But we need the customer ID. We have the email. We can get customer details via get_customer. Let's do that.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-91c1a4ab2001e027",
+            "name": "get_customer",
+            "arguments": "{\"email\": \"olivia.rossi@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "olivia.rossi@example.com"
+          },
+          "raw_arguments": "{\"email\": \"olivia.rossi@example.com\"}",
+          "result": "{\"customer_id\": \"C015\", \"name\": \"Olivia Rossi\", \"email\": \"olivia.rossi@example.com\", \"phone\": \"555-0115\", \"address\": \"77 Vine St, Brooklyn, NY 11201\", \"tier\": \"standard\", \"member_since\": \"2024-02-28\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 4.001,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 596,
+        "completion_tokens": 83,
+        "reasoning_tokens": 40,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Sure, I can help with that. Could you please let me know the order number (e.g., ORD‑1234) you’d like to refund?",
+        "reasoning": "The user says \"I want a refund for my order.\" We need to know which order. We might ask for order ID. We can search help center or ask. We should ask for order ID.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Sure, I can help with that. Could you please let me know the order number (e.g., ORD‑1234) you’d like to refund?",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: olivia.rossi@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "I want a refund for my order."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-91c1a4ab2001e027",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\": \"olivia.rossi@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-91c1a4ab2001e027",
+      "content": "{\"customer_id\": \"C015\", \"name\": \"Olivia Rossi\", \"email\": \"olivia.rossi@example.com\", \"phone\": \"555-0115\", \"address\": \"77 Vine St, Brooklyn, NY 11201\", \"tier\": \"standard\", \"member_since\": \"2024-02-28\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "Sure, I can help with that. Could you please let me know the order number (e.g., ORD‑1234) you’d like to refund?"
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1085,
+    "completion_tokens": 159,
+    "reasoning_tokens": 92
+  },
+  "llm_latency_s": 7.807,
+  "wall_time_s": 8.913,
+  "retries": 0,
+  "trial": 4,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      {
+        "any_of": [
+          "which order",
+          "which of",
+          "which one",
+          "order number",
+          "order id",
+          "specify",
+          "clarify",
+          "let me know"
+        ]
+      }
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": []
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

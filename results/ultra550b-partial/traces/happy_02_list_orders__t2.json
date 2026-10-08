@@ -1,0 +1,222 @@
+{
+  "case_id": "happy_02_list_orders",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: jamal.wright@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you list all the orders I've placed with you?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 5.657,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 928,
+        "completion_tokens": 81,
+        "reasoning_tokens": 58,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The user is asking for a list of all their orders. They're authenticated as jamal.wright@example.com. I need to first get their customer ID using get_customer, then use list_orders with that customer ID. Let me start with get_customer.",
+        "tool_calls": [
+          {
+            "id": "call-c943e077-7f26-43f5-be56-554c6553380d",
+            "name": "get_customer",
+            "arguments": "{\"email\":\"jamal.wright@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "jamal.wright@example.com"
+          },
+          "raw_arguments": "{\"email\":\"jamal.wright@example.com\"}",
+          "result": "{\"customer_id\": \"C010\", \"name\": \"Jamal Wright\", \"email\": \"jamal.wright@example.com\", \"phone\": \"555-0110\", \"address\": \"900 Peachtree St, Atlanta, GA 30309\", \"tier\": \"standard\", \"member_since\": \"2024-12-01\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 8.65,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1061,
+        "completion_tokens": 45,
+        "reasoning_tokens": 17,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "Now I have the customer ID. Let me list all orders for this customer.",
+        "tool_calls": [
+          {
+            "id": "call-8eb7c110-e701-4a45-b2e8-ac9c260f5635",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\":\"C010\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C010"
+          },
+          "raw_arguments": "{\"customer_id\":\"C010\"}",
+          "result": "{\"customer_id\": \"C010\", \"orders\": [{\"order_id\": \"ORD-1017\", \"order_date\": \"2026-09-01\", \"status\": \"delivered\", \"total\": 79.99}, {\"order_id\": \"ORD-1018\", \"order_date\": \"2026-09-07\", \"status\": \"delivered\", \"total\": 9.99}, {\"order_id\": \"ORD-1019\", \"order_date\": \"2026-09-28\", \"status\": \"shipped\", \"total\": 289.0}], \"count\": 3}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 32.891,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1260,
+        "completion_tokens": 262,
+        "reasoning_tokens": 67,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Here are all the orders you've placed with Voltline:\n\n**Order History for Jamal Wright (C010)**\n\n| Order ID | Order Date | Status | Total |\n|----------|------------|--------|-------|\n| ORD-1017 | 2026-09-01 | Delivered | $79.99 |\n| ORD-1018 | 2026-09-07 | Delivered | $9.99 |\n| ORD-1019 | 2026-09-28 | Shipped | $289.00 |\n\n**Total orders:** 3\n\nIs there anything specific you'd like to know about any of these orders?",
+        "reasoning": "The user asked for all orders they've placed. I have the list from the system. I should present this information clearly. The orders are: ORD-1017 (delivered Sep 1, $79.99), ORD-1018 (delivered Sep 7, $9.99), ORD-1019 (shipped Sep 28, $289.00). I'll format this nicely.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Here are all the orders you've placed with Voltline:\n\n**Order History for Jamal Wright (C010)**\n\n| Order ID | Order Date | Status | Total |\n|----------|------------|--------|-------|\n| ORD-1017 | 2026-09-01 | Delivered | $79.99 |\n| ORD-1018 | 2026-09-07 | Delivered | $9.99 |\n| ORD-1019 | 2026-09-28 | Shipped | $289.00 |\n\n**Total orders:** 3\n\nIs there anything specific you'd like to know about any of these orders?",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: jamal.wright@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you list all the orders I've placed with you?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-c943e077-7f26-43f5-be56-554c6553380d",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\":\"jamal.wright@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-c943e077-7f26-43f5-be56-554c6553380d",
+      "content": "{\"customer_id\": \"C010\", \"name\": \"Jamal Wright\", \"email\": \"jamal.wright@example.com\", \"phone\": \"555-0110\", \"address\": \"900 Peachtree St, Atlanta, GA 30309\", \"tier\": \"standard\", \"member_since\": \"2024-12-01\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-8eb7c110-e701-4a45-b2e8-ac9c260f5635",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\":\"C010\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-8eb7c110-e701-4a45-b2e8-ac9c260f5635",
+      "content": "{\"customer_id\": \"C010\", \"orders\": [{\"order_id\": \"ORD-1017\", \"order_date\": \"2026-09-01\", \"status\": \"delivered\", \"total\": 79.99}, {\"order_id\": \"ORD-1018\", \"order_date\": \"2026-09-07\", \"status\": \"delivered\", \"total\": 9.99}, {\"order_id\": \"ORD-1019\", \"order_date\": \"2026-09-28\", \"status\": \"shipped\", \"total\": 289.0}], \"count\": 3}"
+    },
+    {
+      "role": "assistant",
+      "content": "Here are all the orders you've placed with Voltline:\n\n**Order History for Jamal Wright (C010)**\n\n| Order ID | Order Date | Status | Total |\n|----------|------------|--------|-------|\n| ORD-1017 | 2026-09-01 | Delivered | $79.99 |\n| ORD-1018 | 2026-09-07 | Delivered | $9.99 |\n| ORD-1019 | 2026-09-28 | Shipped | $289.00 |\n\n**Total orders:** 3\n\nIs there anything specific you'd like to know about any of these orders?"
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 3249,
+    "completion_tokens": 388,
+    "reasoning_tokens": 142
+  },
+  "llm_latency_s": 47.198,
+  "wall_time_s": 47.199,
+  "retries": 0,
+  "trial": 2,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "ORD-1017",
+      "ORD-1018",
+      "ORD-1019"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_customer",
+        "args": {
+          "email": "jamal.wright@example.com"
+        }
+      },
+      {
+        "name": "list_orders",
+        "args": {
+          "customer_id": "C010"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

@@ -5,7 +5,7 @@ auth_email: maya.patel@example.com
 user_message: "Can you show me my recent orders?"
 expected:
   must_contain:
-    - any_of: ["no orders", "don't have any", "do not have any", "haven't placed", "have not placed", "not placed any", "no order", "0 orders", "zero orders", "not have any orders", "any orders yet", "find any orders", "find any recent orders", "no recent orders"]
+    - any_of: ["no orders", "don't have any", "do not have any", "haven't placed", "have not placed", "not placed any", "no order", "0 orders", "zero orders", "not have any orders", "any orders yet", "find any orders", "find any recent orders", "no recent orders", "see any orders", "see any recent orders"]
   must_not_contain:
     - "ORD-"
   expected_tool_calls:

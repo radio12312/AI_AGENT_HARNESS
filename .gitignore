@@ -6,4 +6,4 @@ __pycache__/
 venv/
 results/smoke-*/
 results/test-*/
-results/*.log
+*.log

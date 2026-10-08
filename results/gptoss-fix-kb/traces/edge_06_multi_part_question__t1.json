@@ -1,0 +1,228 @@
+{
+  "case_id": "edge_06_multi_part_question",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [
+    "kb_grounding"
+  ],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: farid.haddad@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "Two things: what's the status of my order ORD-1010, and how long does it take for a refund to show up on my card?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 2.837,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 549,
+        "completion_tokens": 72,
+        "reasoning_tokens": 47,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to get order status for ORD-1010. Use get_order. Also need to answer question about refund time. We should search KB for refund time. So use search_kb with query \"refund time card\".",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-a5f2e447343e25e9",
+            "name": "search_kb",
+            "arguments": "{\"query\": \"refund time card\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "search_kb",
+          "arguments": {
+            "query": "refund time card"
+          },
+          "raw_arguments": "{\"query\": \"refund time card\"}",
+          "result": "{\"query\": \"refund time card\", \"results\": [{\"id\": \"KB-001\", \"title\": \"Refund Policy\", \"body\": \"Refunds are available for orders delivered within the last 30 days. Support agents may issue refunds of up to $200.00 per order; any refund above $200.00 must be escalated to a human specialist. Approved refunds are returned to the original payment method and usually arrive within 5-7 business days. Each order can only be refunded once.\"}, {\"id\": \"KB-006\", \"title\": \"Payment Methods\", \"body\": \"We accept Visa, Mastercard, American Express, Discover and PayPal. Gift cards can be combined with one other payment method. We never ask for full card numbers over chat.\"}]}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 32.171,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 744,
+        "completion_tokens": 44,
+        "reasoning_tokens": 13,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to get status of order ORD-1010. Use get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-8b849f14d24d1521",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1010\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1010"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1010\"}",
+          "result": "{\"order_id\": \"ORD-1010\", \"customer_id\": \"C006\", \"order_date\": \"2026-09-24\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-PAD-10\", \"name\": \"Mouse Pad\", \"qty\": 1, \"unit_price\": 18.99}], \"total\": 18.99, \"delivered_on\": \"2026-09-28\", \"carrier\": \"USPS\", \"tracking_number\": \"9400111899220000001010\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 7.631,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 905,
+        "completion_tokens": 254,
+        "reasoning_tokens": 119,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Your order **ORD‑1010** was delivered on **September 28, 2026**. The package was shipped via USPS and the tracking number is **9400111899220000001010**.\n\nRegarding refunds: once a refund is processed, the amount is returned to the original payment method and typically appears on your card statement within **5–7 business days**. If you need a refund, just let me know the amount and the reason, and I’ll take care of it (provided it’s $200 or less and the order was delivered within the last 30 days).",
+        "reasoning": "We have order ORD-1010: delivered on 2026-09-28. Today is 2026-09-30. So delivered within last 30 days. No refunds yet. The customer asked: \"Two things: what's the status of my order ORD-1010, and how long does it take for a refund to show up on my card?\" We have status: delivered. And refund time: 5-7 business days. Also mention that refunds are returned to original payment method. Also maybe mention that refund can be issued up to $200. But no refund request. Just answer.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Your order **ORD‑1010** was delivered on **September 28, 2026**. The package was shipped via USPS and the tracking number is **9400111899220000001010**.\n\nRegarding refunds: once a refund is processed, the amount is returned to the original payment method and typically appears on your card statement within **5–7 business days**. If you need a refund, just let me know the amount and the reason, and I’ll take care of it (provided it’s $200 or less and the order was delivered within the last 30 days).",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: farid.haddad@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "Two things: what's the status of my order ORD-1010, and how long does it take for a refund to show up on my card?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-a5f2e447343e25e9",
+          "type": "function",
+          "function": {
+            "name": "search_kb",
+            "arguments": "{\"query\": \"refund time card\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a5f2e447343e25e9",
+      "content": "{\"query\": \"refund time card\", \"results\": [{\"id\": \"KB-001\", \"title\": \"Refund Policy\", \"body\": \"Refunds are available for orders delivered within the last 30 days. Support agents may issue refunds of up to $200.00 per order; any refund above $200.00 must be escalated to a human specialist. Approved refunds are returned to the original payment method and usually arrive within 5-7 business days. Each order can only be refunded once.\"}, {\"id\": \"KB-006\", \"title\": \"Payment Methods\", \"body\": \"We accept Visa, Mastercard, American Express, Discover and PayPal. Gift cards can be combined with one other payment method. We never ask for full card numbers over chat.\"}]}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-8b849f14d24d1521",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1010\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8b849f14d24d1521",
+      "content": "{\"order_id\": \"ORD-1010\", \"customer_id\": \"C006\", \"order_date\": \"2026-09-24\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-PAD-10\", \"name\": \"Mouse Pad\", \"qty\": 1, \"unit_price\": 18.99}], \"total\": 18.99, \"delivered_on\": \"2026-09-28\", \"carrier\": \"USPS\", \"tracking_number\": \"9400111899220000001010\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "Your order **ORD‑1010** was delivered on **September 28, 2026**. The package was shipped via USPS and the tracking number is **9400111899220000001010**.\n\nRegarding refunds: once a refund is processed, the amount is returned to the original payment method and typically appears on your card statement within **5–7 business days**. If you need a refund, just let me know the amount and the reason, and I’ll take care of it (provided it’s $200 or less and the order was delivered within the last 30 days)."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 2198,
+    "completion_tokens": 370,
+    "reasoning_tokens": 179
+  },
+  "llm_latency_s": 42.639,
+  "wall_time_s": 43.277,
+  "retries": 0,
+  "trial": 1,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "delivered",
+      {
+        "any_of": [
+          "5-7 business days",
+          "5 to 7 business days",
+          "five to seven business days",
+          "5-7 days"
+        ]
+      }
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1010"
+        }
+      },
+      {
+        "name": "search_kb"
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

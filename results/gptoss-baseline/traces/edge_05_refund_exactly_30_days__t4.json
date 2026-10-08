@@ -1,0 +1,292 @@
+{
+  "case_id": "edge_05_refund_exactly_30_days",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: emma.schultz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "My HD webcam from order ORD-1008 stopped working. Can I get a refund?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 2.549,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 498,
+        "completion_tokens": 50,
+        "reasoning_tokens": 21,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to check order ORD-1008 for customer emma.schultz@example.com. Use get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-adbd518ba358fa4b",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1008\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1008"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1008\"}",
+          "result": "{\"order_id\": \"ORD-1008\", \"customer_id\": \"C005\", \"order_date\": \"2026-08-26\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-CAM-08\", \"name\": \"HD Webcam\", \"qty\": 1, \"unit_price\": 75.0}], \"total\": 75.0, \"delivered_on\": \"2026-08-31\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450008\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 5.694,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 658,
+        "completion_tokens": 156,
+        "reasoning_tokens": 85,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We have order ORD-1008: delivered on 2026-08-31. Today is 2026-09-30. That's 30 days? Let's calculate: 2026-08-31 to 2026-09-30 is 30 days inclusive? Usually 31 days in August? 31 Aug to 30 Sep: 30 days difference? 31 Aug to 30 Sep is 30 days. So within 30 days. Refund allowed. Amount is $75. So we can issue refund. Let's do issue_refund.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-adc3e2b5fdf4bf42",
+            "name": "issue_refund",
+            "arguments": "{\"order_id\": \"ORD-1008\", \"amount\": 75.0, \"reason\": \"Defective product\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "issue_refund",
+          "arguments": {
+            "order_id": "ORD-1008",
+            "amount": 75.0,
+            "reason": "Defective product"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1008\", \"amount\": 75.0, \"reason\": \"Defective product\"}",
+          "result": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1008\", \"amount\": 75.0, \"status\": \"processed\", \"message\": \"Refund of $75.00 issued to the original payment method (5-7 business days).\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 17.611,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 769,
+        "completion_tokens": 236,
+        "reasoning_tokens": 200,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to check policy: Refunds only for orders delivered within last 30 days. Today is 2026-09-30. Order delivered on 2026-08-31. That's 30 days? Let's calculate: 2026-08-31 to 2026-09-30 is 30 days. Usually inclusive? 31 Aug to 30 Sep is 30 days. So it's exactly 30 days. Policy says within the last 30 days. Does that include 30 days? Usually \"within\" could mean up to 30 days inclusive. Likely okay. Also refund amount $75 <= $200. So okay. We already issued refund. Need to ensure not refund twice. We just did. So it's fine. We should confirm that the order belongs to authenticated customer. The order shows customer_id C005. We need to confirm that authenticated email is emma.schultz@example.com. We don't know the mapping. We need to look up customer account by email. Let's do get_customer.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-9b927c5d6603fdb1",
+            "name": "get_customer",
+            "arguments": "{\"email\": \"emma.schultz@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 3,
+          "name": "get_customer",
+          "arguments": {
+            "email": "emma.schultz@example.com"
+          },
+          "raw_arguments": "{\"email\": \"emma.schultz@example.com\"}",
+          "result": "{\"customer_id\": \"C005\", \"name\": \"Emma Schultz\", \"email\": \"emma.schultz@example.com\", \"phone\": \"555-0105\", \"address\": \"19 Elm Court, Denver, CO 80202\", \"tier\": \"standard\", \"member_since\": \"2024-08-09\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 4,
+      "latency_s": 10.461,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 871,
+        "completion_tokens": 248,
+        "reasoning_tokens": 153,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Hi Emma,\n\nI’ve processed a refund of **$75.00** for your HD webcam (order ORD‑1008). The amount will appear on your original payment method in 5–7 business days.\n\nIf you have any other questions or need further assistance, just let me know!",
+        "reasoning": "We have processed a refund for order ORD-1008, amount 75. According to policy, refunds allowed only within last 30 days. Order date 2026-08-26, today 2026-09-30, that's 35 days after order date. But delivered date 2026-08-31. 30 days from delivery would be 2026-09-30? Actually 30 days after 2026-08-31 is 2026-09-30. Today is 2026-09-30. So within 30 days? If inclusive? It's exactly 30 days. Usually within last 30 days means less than or equal to 30 days. So allowed. Refund amount 75 < 200. So fine.\n\nWe have already issued refund. So we should respond to the customer confirming refund. Also mention timeframe.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Hi Emma,\n\nI’ve processed a refund of **$75.00** for your HD webcam (order ORD‑1008). The amount will appear on your original payment method in 5–7 business days.\n\nIf you have any other questions or need further assistance, just let me know!",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: emma.schultz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "My HD webcam from order ORD-1008 stopped working. Can I get a refund?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-adbd518ba358fa4b",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1008\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-adbd518ba358fa4b",
+      "content": "{\"order_id\": \"ORD-1008\", \"customer_id\": \"C005\", \"order_date\": \"2026-08-26\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-CAM-08\", \"name\": \"HD Webcam\", \"qty\": 1, \"unit_price\": 75.0}], \"total\": 75.0, \"delivered_on\": \"2026-08-31\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450008\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-adc3e2b5fdf4bf42",
+          "type": "function",
+          "function": {
+            "name": "issue_refund",
+            "arguments": "{\"order_id\": \"ORD-1008\", \"amount\": 75.0, \"reason\": \"Defective product\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-adc3e2b5fdf4bf42",
+      "content": "{\"refund_id\": \"RF-1002\", \"order_id\": \"ORD-1008\", \"amount\": 75.0, \"status\": \"processed\", \"message\": \"Refund of $75.00 issued to the original payment method (5-7 business days).\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-9b927c5d6603fdb1",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\": \"emma.schultz@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-9b927c5d6603fdb1",
+      "content": "{\"customer_id\": \"C005\", \"name\": \"Emma Schultz\", \"email\": \"emma.schultz@example.com\", \"phone\": \"555-0105\", \"address\": \"19 Elm Court, Denver, CO 80202\", \"tier\": \"standard\", \"member_since\": \"2024-08-09\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "Hi Emma,\n\nI’ve processed a refund of **$75.00** for your HD webcam (order ORD‑1008). The amount will appear on your original payment method in 5–7 business days.\n\nIf you have any other questions or need further assistance, just let me know!"
+    }
+  ],
+  "final_state": {
+    "refunds": [
+      {
+        "order_id": "ORD-1008",
+        "amount": 75.0
+      }
+    ],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 2796,
+    "completion_tokens": 690,
+    "reasoning_tokens": 459
+  },
+  "llm_latency_s": 36.315,
+  "wall_time_s": 36.315,
+  "retries": 0,
+  "trial": 4,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "75"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1008"
+        }
+      },
+      {
+        "name": "issue_refund",
+        "args": {
+          "order_id": "ORD-1008",
+          "amount": 75.0
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "expected_state": {
+      "refunds": [
+        {
+          "order_id": "ORD-1008",
+          "amount": 75.0
+        }
+      ],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

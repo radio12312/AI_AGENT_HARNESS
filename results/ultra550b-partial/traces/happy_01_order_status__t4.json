@@ -1,0 +1,277 @@
+{
+  "case_id": "happy_01_order_status",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Hi, where is my order ORD-1002? It hasn't arrived yet."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 2.558,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 938,
+        "completion_tokens": 72,
+        "reasoning_tokens": 41,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer is asking about order ORD-1002. I need to look up the order details to see its status, tracking, and delivery information. Let me use the get_order tool.",
+        "tool_calls": [
+          {
+            "id": "call-326553f5-4675-4767-879c-2d7bcaae543b",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1002\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1002"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-1002\"}",
+          "result": "{\"order_id\": \"ORD-1002\", \"customer_id\": \"C001\", \"order_date\": \"2026-09-26\", \"status\": \"shipped\", \"items\": [{\"sku\": \"SKU-KBD-02\", \"name\": \"Mechanical Keyboard\", \"qty\": 1, \"unit_price\": 129.0}], \"total\": 129.0, \"delivered_on\": null, \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123456784\", \"estimated_delivery\": \"2026-10-02\", \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 16.066,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 1.75
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 3.47
+        },
+        {
+          "attempt": 3,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 6.91
+        },
+        {
+          "attempt": 4,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 13.11
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1143,
+        "completion_tokens": 90,
+        "reasoning_tokens": 56,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The order ORD-1002 is for customer C001. The authenticated customer is alice.nguyen@example.com. I should verify that this order belongs to the authenticated customer. Let me check the customer ID for alice.nguyen@example.com.",
+        "tool_calls": [
+          {
+            "id": "call-919724f3-c7db-4a70-a516-f160a1f6491f",
+            "name": "get_customer",
+            "arguments": "{\"email\":\"alice.nguyen@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "get_customer",
+          "arguments": {
+            "email": "alice.nguyen@example.com"
+          },
+          "raw_arguments": "{\"email\":\"alice.nguyen@example.com\"}",
+          "result": "{\"customer_id\": \"C001\", \"name\": \"Alice Nguyen\", \"email\": \"alice.nguyen@example.com\", \"phone\": \"555-0101\", \"address\": \"12 Birch Lane, Portland, OR 97205\", \"tier\": \"gold\", \"member_since\": \"2023-02-11\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 33.851,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.5
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 2.83
+        },
+        {
+          "attempt": 3,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 5.39
+        },
+        {
+          "attempt": 4,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 11.16
+        },
+        {
+          "attempt": 5,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 18.43
+        },
+        {
+          "attempt": 6,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 62.61
+        },
+        {
+          "attempt": 7,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 49.9
+        },
+        {
+          "attempt": 8,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 78.57
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1277,
+        "completion_tokens": 244,
+        "reasoning_tokens": 88,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Your order **ORD-1002** (Mechanical Keyboard, $129.00) was shipped on **2026-09-26** via **UPS**.\n\n**Tracking number:** `1Z999AA10123456784`  \n**Estimated delivery:** **2026-10-02** (in 2 days)\n\nYou can track the shipment directly on the UPS website using the tracking number above. If the package hasn't arrived by the estimated delivery date, please let me know and I'll look into it further.",
+        "reasoning": "The order ORD-1002 belongs to customer C001, which matches the authenticated customer Alice Nguyen. The order status is \"shipped\" with carrier UPS, tracking number 1Z999AA10123456784, and estimated delivery is 2026-10-02. Today is 2026-09-30, so the estimated delivery is in 2 days. I should provide the tracking information and estimated delivery date.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Your order **ORD-1002** (Mechanical Keyboard, $129.00) was shipped on **2026-09-26** via **UPS**.\n\n**Tracking number:** `1Z999AA10123456784`  \n**Estimated delivery:** **2026-10-02** (in 2 days)\n\nYou can track the shipment directly on the UPS website using the tracking number above. If the package hasn't arrived by the estimated delivery date, please let me know and I'll look into it further.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: alice.nguyen@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Hi, where is my order ORD-1002? It hasn't arrived yet."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-326553f5-4675-4767-879c-2d7bcaae543b",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1002\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-326553f5-4675-4767-879c-2d7bcaae543b",
+      "content": "{\"order_id\": \"ORD-1002\", \"customer_id\": \"C001\", \"order_date\": \"2026-09-26\", \"status\": \"shipped\", \"items\": [{\"sku\": \"SKU-KBD-02\", \"name\": \"Mechanical Keyboard\", \"qty\": 1, \"unit_price\": 129.0}], \"total\": 129.0, \"delivered_on\": null, \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123456784\", \"estimated_delivery\": \"2026-10-02\", \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-919724f3-c7db-4a70-a516-f160a1f6491f",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\":\"alice.nguyen@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-919724f3-c7db-4a70-a516-f160a1f6491f",
+      "content": "{\"customer_id\": \"C001\", \"name\": \"Alice Nguyen\", \"email\": \"alice.nguyen@example.com\", \"phone\": \"555-0101\", \"address\": \"12 Birch Lane, Portland, OR 97205\", \"tier\": \"gold\", \"member_since\": \"2023-02-11\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "Your order **ORD-1002** (Mechanical Keyboard, $129.00) was shipped on **2026-09-26** via **UPS**.\n\n**Tracking number:** `1Z999AA10123456784`  \n**Estimated delivery:** **2026-10-02** (in 2 days)\n\nYou can track the shipment directly on the UPS website using the tracking number above. If the package hasn't arrived by the estimated delivery date, please let me know and I'll look into it further."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 3358,
+    "completion_tokens": 406,
+    "reasoning_tokens": 185
+  },
+  "llm_latency_s": 52.476,
+  "wall_time_s": 322.783,
+  "retries": 12,
+  "trial": 4,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "shipped",
+      "1Z999AA10123456784"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1002"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

@@ -1,0 +1,222 @@
+{
+  "case_id": "edge_03_order_not_found",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: noah.fischer@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "What's the status of order ORD-9999?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 7.05,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.86
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 2.37
+        },
+        {
+          "attempt": 3,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 6.54
+        },
+        {
+          "attempt": 4,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 11.41
+        }
+      ],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 930,
+        "completion_tokens": 122,
+        "reasoning_tokens": 99,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The user is asking about the status of order ORD-9999. I need to use the get_order tool to retrieve the order details. However, I should first verify that the user is authenticated and has access to this order. The user is authenticated as noah.fischer@example.com. I should check if this order belongs to them. But the get_order tool only requires order_id. I'll use it to get the order details.",
+        "tool_calls": [
+          {
+            "id": "call-d3c189b2-4700-47c0-a44f-5641bece342d",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-9999\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-9999"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-9999\"}",
+          "result": "{\"error\": \"not_found\", \"message\": \"No order with id ORD-9999\"}",
+          "ok": false,
+          "fault": null,
+          "error": "not_found",
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 2.804,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 1.46
+        },
+        {
+          "attempt": 2,
+          "error": "HTTP 429: Error code: 429 - {'status': 429, 'title': 'Too Many Requests'}",
+          "sleep_s": 2.53
+        },
+        {
+          "attempt": 3,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 6.58
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 999,
+        "completion_tokens": 129,
+        "reasoning_tokens": 52,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I checked our system, and there's no order with the ID **ORD-9999** associated with your account. \n\nCould you please double-check the order number? If you have a different order ID (like ORD-1001, ORD-1002, etc.), I'd be happy to look up its status for you.",
+        "reasoning": "The order ORD-9999 was not found. I should inform the customer that this order doesn't exist in our system. Let me check if they might have a different order ID or if there's a typo. I'll respond accordingly.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I checked our system, and there's no order with the ID **ORD-9999** associated with your account. \n\nCould you please double-check the order number? If you have a different order ID (like ORD-1001, ORD-1002, etc.), I'd be happy to look up its status for you.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: noah.fischer@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "What's the status of order ORD-9999?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-d3c189b2-4700-47c0-a44f-5641bece342d",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-9999\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-d3c189b2-4700-47c0-a44f-5641bece342d",
+      "content": "{\"error\": \"not_found\", \"message\": \"No order with id ORD-9999\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I checked our system, and there's no order with the ID **ORD-9999** associated with your account. \n\nCould you please double-check the order number? If you have a different order ID (like ORD-1001, ORD-1002, etc.), I'd be happy to look up its status for you."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1929,
+    "completion_tokens": 251,
+    "reasoning_tokens": 151
+  },
+  "llm_latency_s": 9.854,
+  "wall_time_s": 58.002,
+  "retries": 7,
+  "trial": 5,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      {
+        "any_of": [
+          "not find",
+          "couldn't find",
+          "could not find",
+          "can't find",
+          "cannot find",
+          "couldn't locate",
+          "could not locate",
+          "no order",
+          "not found",
+          "unable to find",
+          "unable to locate",
+          "doesn't exist",
+          "does not exist",
+          "doesn't match",
+          "does not match",
+          "no record"
+        ]
+      }
+    ],
+    "must_not_contain": [
+      {
+        "any_of": [
+          "has been delivered",
+          "was delivered",
+          "is on its way",
+          "has shipped",
+          "tracking number is"
+        ]
+      }
+    ],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-9999"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": []
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

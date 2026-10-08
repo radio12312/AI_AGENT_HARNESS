@@ -1,0 +1,218 @@
+{
+  "case_id": "policy_01_over_200_escalate",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [
+    "kb_grounding"
+  ],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: carmen.diaz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "The noise-cancelling headphones from order ORD-1005 have a loud buzzing in the left ear. I want my money back."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 2.129,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 545,
+        "completion_tokens": 96,
+        "reasoning_tokens": 71,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to check order ORD-1005 for customer carmen.diaz@example.com. Use get_order. Then check delivery date. Also check if within 30 days. Also check order total to ensure refund <=200. If >200, need to escalate. Also check if refund already issued? Probably not. Let's call get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-8fc6da3e2685cfc8",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1005\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1005"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1005\"}",
+          "result": "{\"order_id\": \"ORD-1005\", \"customer_id\": \"C003\", \"order_date\": \"2026-09-08\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-HPH-05\", \"name\": \"Noise-Cancelling Headphones\", \"qty\": 1, \"unit_price\": 349.99}], \"total\": 349.99, \"delivered_on\": \"2026-09-12\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450005\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 4.038,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 710,
+        "completion_tokens": 206,
+        "reasoning_tokens": 136,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We have order ORD-1005, delivered on 2026-09-12. Today is 2026-09-30. That is 18 days after delivery, within 30 days. So refund allowed. Amount is 349.99 > 200. Policy says cannot issue refund over 200. Must either issue partial? But policy says \"You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalated.\" So we must call escalated. The user wants money back. We should explain that due to policy, maximum refund is $200. We can offer partial refund or exchange. So we should call escalation.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-ba1cebf01fc753f6",
+            "name": "escalate_to_human",
+            "arguments": "{\"summary\": \"Customer requests full refund for noisy headphones, order delivered 18 days ago. Refund amount $349.99 exceeds $200 cap. Must be escalated to human.\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "escalate_to_human",
+          "arguments": {
+            "summary": "Customer requests full refund for noisy headphones, order delivered 18 days ago. Refund amount $349.99 exceeds $200 cap. Must be escalated to human."
+          },
+          "raw_arguments": "{\"summary\": \"Customer requests full refund for noisy headphones, order delivered 18 days ago. Refund amount $349.99 exceeds $200 cap. Must be escalated to human.\"}",
+          "result": "{\"ticket_id\": \"ESC-1001\", \"status\": \"queued\", \"message\": \"A human specialist will follow up with the customer within 24 hours.\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 1.768,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 816,
+        "completion_tokens": 77,
+        "reasoning_tokens": 11,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I’m sorry to hear about the issue with your headphones. I’ve created a support ticket for you so a specialist can help resolve this. They’ll reach out within the next 24 hours. If you have any other questions in the meantime, feel free to let me know!",
+        "reasoning": "We have escalated. Need to respond to customer.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I’m sorry to hear about the issue with your headphones. I’ve created a support ticket for you so a specialist can help resolve this. They’ll reach out within the next 24 hours. If you have any other questions in the meantime, feel free to let me know!",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: carmen.diaz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "The noise-cancelling headphones from order ORD-1005 have a loud buzzing in the left ear. I want my money back."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-8fc6da3e2685cfc8",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1005\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-8fc6da3e2685cfc8",
+      "content": "{\"order_id\": \"ORD-1005\", \"customer_id\": \"C003\", \"order_date\": \"2026-09-08\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-HPH-05\", \"name\": \"Noise-Cancelling Headphones\", \"qty\": 1, \"unit_price\": 349.99}], \"total\": 349.99, \"delivered_on\": \"2026-09-12\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450005\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-ba1cebf01fc753f6",
+          "type": "function",
+          "function": {
+            "name": "escalate_to_human",
+            "arguments": "{\"summary\": \"Customer requests full refund for noisy headphones, order delivered 18 days ago. Refund amount $349.99 exceeds $200 cap. Must be escalated to human.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-ba1cebf01fc753f6",
+      "content": "{\"ticket_id\": \"ESC-1001\", \"status\": \"queued\", \"message\": \"A human specialist will follow up with the customer within 24 hours.\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I’m sorry to hear about the issue with your headphones. I’ve created a support ticket for you so a specialist can help resolve this. They’ll reach out within the next 24 hours. If you have any other questions in the meantime, feel free to let me know!"
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": true,
+    "escalations": 1
+  },
+  "usage": {
+    "prompt_tokens": 2071,
+    "completion_tokens": 379,
+    "reasoning_tokens": 218
+  },
+  "llm_latency_s": 7.935,
+  "wall_time_s": 9.532,
+  "retries": 0,
+  "trial": 2,
+  "category": "policy",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1005"
+        }
+      },
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": true
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

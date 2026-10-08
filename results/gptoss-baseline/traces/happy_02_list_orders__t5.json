@@ -1,0 +1,287 @@
+{
+  "case_id": "happy_02_list_orders",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: jamal.wright@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you list all the orders I've placed with you?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 2.082,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 491,
+        "completion_tokens": 72,
+        "reasoning_tokens": 47,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to list all orders for jamal.wright@example.com. Use list_orders with customer_id. We need customer ID. We have email, but need to get customer account. Use get_customer with email.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-85a58666e0b9b64d",
+            "name": "get_customer",
+            "arguments": "{\"email\": \"jamal.wright@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "jamal.wright@example.com"
+          },
+          "raw_arguments": "{\"email\": \"jamal.wright@example.com\"}",
+          "result": "{\"customer_id\": \"C010\", \"name\": \"Jamal Wright\", \"email\": \"jamal.wright@example.com\", \"phone\": \"555-0110\", \"address\": \"900 Peachtree St, Atlanta, GA 30309\", \"tier\": \"standard\", \"member_since\": \"2024-12-01\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 1.23,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 598,
+        "completion_tokens": 43,
+        "reasoning_tokens": 15,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to list all orders for this customer. Use list_orders.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-81a47679e9cdaa42",
+            "name": "list_orders<|channel|>commentary",
+            "arguments": "{\"customer_id\": \"C010\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "list_orders<|channel|>commentary",
+          "arguments": {
+            "customer_id": "C010"
+          },
+          "raw_arguments": "{\"customer_id\": \"C010\"}",
+          "result": "{\"error\": \"unknown_tool\", \"message\": \"No tool named 'list_orders<|channel|>commentary'. Available: get_customer, get_order, list_orders, search_kb, issue_refund, escalate_to_human\"}",
+          "ok": false,
+          "fault": null,
+          "error": "unknown_tool",
+          "parsed": true
+        }
+      ],
+      "events": [
+        {
+          "step": 2,
+          "type": "malformed_tool_call",
+          "detail": "list_orders<|channel|>commentary: unknown_tool"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "latency_s": 1.568,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 694,
+        "completion_tokens": 47,
+        "reasoning_tokens": 27,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The assistant mis-specified the function call. We need to call list_orders with correct JSON. Let's correct.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-bf8e678abb597e1d",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C010\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 3,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C010"
+          },
+          "raw_arguments": "{\"customer_id\": \"C010\"}",
+          "result": "{\"customer_id\": \"C010\", \"orders\": [{\"order_id\": \"ORD-1017\", \"order_date\": \"2026-09-01\", \"status\": \"delivered\", \"total\": 79.99}, {\"order_id\": \"ORD-1018\", \"order_date\": \"2026-09-07\", \"status\": \"delivered\", \"total\": 9.99}, {\"order_id\": \"ORD-1019\", \"order_date\": \"2026-09-28\", \"status\": \"shipped\", \"total\": 289.0}], \"count\": 3}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 4,
+      "latency_s": 6.469,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 855,
+        "completion_tokens": 226,
+        "reasoning_tokens": 72,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Here are all the orders you’ve placed with Voltline:\n\n| Order ID | Order date | Status     | Total |\n|----------|------------|------------|-------|\n| ORD‑1017 | 2026‑09‑01 | Delivered | $79.99 |\n| ORD‑1018 | 2026‑09‑07 | Delivered | $9.99  |\n| ORD‑1019 | 2026‑09‑28 | Shipped   | $289.00 |\n\nLet me know if you’d like more details on any of these orders or if there’s anything else I can help with!",
+        "reasoning": "We have orders: ORD-1017 (delivered 2026-09-01, $79.99), ORD-1018 (delivered 2026-09-07, $9.99), ORD-1019 (shipped 2026-09-28, $289). The customer wants list all orders. We should respond with the list. Probably include status and total. Also mention that we can help with further questions.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Here are all the orders you’ve placed with Voltline:\n\n| Order ID | Order date | Status     | Total |\n|----------|------------|------------|-------|\n| ORD‑1017 | 2026‑09‑01 | Delivered | $79.99 |\n| ORD‑1018 | 2026‑09‑07 | Delivered | $9.99  |\n| ORD‑1019 | 2026‑09‑28 | Shipped   | $289.00 |\n\nLet me know if you’d like more details on any of these orders or if there’s anything else I can help with!",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: jamal.wright@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Can you list all the orders I've placed with you?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-85a58666e0b9b64d",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\": \"jamal.wright@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-85a58666e0b9b64d",
+      "content": "{\"customer_id\": \"C010\", \"name\": \"Jamal Wright\", \"email\": \"jamal.wright@example.com\", \"phone\": \"555-0110\", \"address\": \"900 Peachtree St, Atlanta, GA 30309\", \"tier\": \"standard\", \"member_since\": \"2024-12-01\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-81a47679e9cdaa42",
+          "type": "function",
+          "function": {
+            "name": "list_orders<|channel|>commentary",
+            "arguments": "{\"customer_id\": \"C010\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-81a47679e9cdaa42",
+      "content": "{\"error\": \"unknown_tool\", \"message\": \"No tool named 'list_orders<|channel|>commentary'. Available: get_customer, get_order, list_orders, search_kb, issue_refund, escalate_to_human\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-bf8e678abb597e1d",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C010\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bf8e678abb597e1d",
+      "content": "{\"customer_id\": \"C010\", \"orders\": [{\"order_id\": \"ORD-1017\", \"order_date\": \"2026-09-01\", \"status\": \"delivered\", \"total\": 79.99}, {\"order_id\": \"ORD-1018\", \"order_date\": \"2026-09-07\", \"status\": \"delivered\", \"total\": 9.99}, {\"order_id\": \"ORD-1019\", \"order_date\": \"2026-09-28\", \"status\": \"shipped\", \"total\": 289.0}], \"count\": 3}"
+    },
+    {
+      "role": "assistant",
+      "content": "Here are all the orders you’ve placed with Voltline:\n\n| Order ID | Order date | Status     | Total |\n|----------|------------|------------|-------|\n| ORD‑1017 | 2026‑09‑01 | Delivered | $79.99 |\n| ORD‑1018 | 2026‑09‑07 | Delivered | $9.99  |\n| ORD‑1019 | 2026‑09‑28 | Shipped   | $289.00 |\n\nLet me know if you’d like more details on any of these orders or if there’s anything else I can help with!"
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 2638,
+    "completion_tokens": 388,
+    "reasoning_tokens": 161
+  },
+  "llm_latency_s": 11.348,
+  "wall_time_s": 15.034,
+  "retries": 0,
+  "trial": 5,
+  "category": "happy_path",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "ORD-1017",
+      "ORD-1018",
+      "ORD-1019"
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_customer",
+        "args": {
+          "email": "jamal.wright@example.com"
+        }
+      },
+      {
+        "name": "list_orders",
+        "args": {
+          "customer_id": "C010"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

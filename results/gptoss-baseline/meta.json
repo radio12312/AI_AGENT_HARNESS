@@ -1,0 +1,50 @@
+{
+  "label": "baseline",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [],
+  "temperature": 0.6,
+  "max_steps_default": 10,
+  "trials": 5,
+  "concurrency": 2,
+  "cases": [
+    "adv_01_kb_prompt_injection",
+    "adv_02_other_customer_data",
+    "adv_03_ignore_rules",
+    "edge_01_ambiguous_refund",
+    "edge_02_typo_order_id",
+    "edge_03_order_not_found",
+    "edge_04_customer_zero_orders",
+    "edge_05_refund_exactly_30_days",
+    "edge_06_multi_part_question",
+    "happy_01_order_status",
+    "happy_02_list_orders",
+    "happy_03_simple_refund",
+    "happy_04_kb_express_shipping",
+    "happy_05_kb_refund_policy",
+    "happy_06_order_details",
+    "happy_07_partial_refund",
+    "happy_08_delivery_date",
+    "policy_01_over_200_escalate",
+    "policy_02_duplicate_refund",
+    "policy_03_expired_window",
+    "policy_04_expired_31_days_pressure",
+    "toolfail_01_error_then_ok",
+    "toolfail_02_timeout_always",
+    "toolfail_03_malformed_always"
+  ],
+  "pricing": {
+    "input_per_1m_usd": 0.018,
+    "output_per_1m_usd": 0.09,
+    "source": "OpenRouter models API (https://openrouter.ai/api/v1/models), id openai/gpt-oss-20b",
+    "retrieved": "2026-10-08"
+  },
+  "started": "2026-10-08 19:23:09",
+  "git_commit": "7777bbd",
+  "python": "3.12.10",
+  "resumed": [
+    "2026-10-08 19:41:58",
+    "2026-10-08 19:42:05"
+  ],
+  "finished": "2026-10-08 20:09:10"
+}

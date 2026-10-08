@@ -1,0 +1,244 @@
+{
+  "case_id": "edge_04_customer_zero_orders",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [
+    "kb_grounding"
+  ],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: maya.patel@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "Can you show me my recent orders?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 1.897,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 525,
+        "completion_tokens": 66,
+        "reasoning_tokens": 46,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to list recent orders for authenticated customer maya.patel@example.com. We need to look up the customer account by email to get customer ID, then list orders. Use get_customer.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-888c0eccd5bd1f81",
+            "name": "get_customer",
+            "arguments": "{\"email\": \"maya.patel@example.com\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_customer",
+          "arguments": {
+            "email": "maya.patel@example.com"
+          },
+          "raw_arguments": "{\"email\": \"maya.patel@example.com\"}",
+          "result": "{\"customer_id\": \"C013\", \"name\": \"Maya Patel\", \"email\": \"maya.patel@example.com\", \"phone\": \"555-0113\", \"address\": \"48 Lotus St, Edison, NJ 08817\", \"tier\": \"standard\", \"member_since\": \"2026-09-01\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 0.81,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 628,
+        "completion_tokens": 35,
+        "reasoning_tokens": 10,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We have customer details. Need list orders.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-a42f00cbb0b211cd",
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C013\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "list_orders",
+          "arguments": {
+            "customer_id": "C013"
+          },
+          "raw_arguments": "{\"customer_id\": \"C013\"}",
+          "result": "{\"customer_id\": \"C013\", \"orders\": [], \"count\": 0}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 1.973,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 679,
+        "completion_tokens": 145,
+        "reasoning_tokens": 94,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I’m sorry, but I don’t see any orders on your account at the moment. If you think this is a mistake or you’d like to check a specific order number, just let me know and I’ll look into it.",
+        "reasoning": "The list_orders returned no orders. That seems odd. Maybe the user has no orders. We should confirm. We might need to search the kb for \"orders\" or \"recent orders\" but the policy says to show recent orders. If none, we can say no orders found. But we might want to double-check by searching kb. But likely it's correct. We can respond: \"I couldn't find any orders.\" That is fine.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I’m sorry, but I don’t see any orders on your account at the moment. If you think this is a mistake or you’d like to check a specific order number, just let me know and I’ll look into it.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: maya.patel@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "Can you show me my recent orders?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-888c0eccd5bd1f81",
+          "type": "function",
+          "function": {
+            "name": "get_customer",
+            "arguments": "{\"email\": \"maya.patel@example.com\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-888c0eccd5bd1f81",
+      "content": "{\"customer_id\": \"C013\", \"name\": \"Maya Patel\", \"email\": \"maya.patel@example.com\", \"phone\": \"555-0113\", \"address\": \"48 Lotus St, Edison, NJ 08817\", \"tier\": \"standard\", \"member_since\": \"2026-09-01\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-a42f00cbb0b211cd",
+          "type": "function",
+          "function": {
+            "name": "list_orders",
+            "arguments": "{\"customer_id\": \"C013\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-a42f00cbb0b211cd",
+      "content": "{\"customer_id\": \"C013\", \"orders\": [], \"count\": 0}"
+    },
+    {
+      "role": "assistant",
+      "content": "I’m sorry, but I don’t see any orders on your account at the moment. If you think this is a mistake or you’d like to check a specific order number, just let me know and I’ll look into it."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 1832,
+    "completion_tokens": 246,
+    "reasoning_tokens": 150
+  },
+  "llm_latency_s": 4.68,
+  "wall_time_s": 9.844,
+  "retries": 0,
+  "trial": 5,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      {
+        "any_of": [
+          "no orders",
+          "don't have any",
+          "do not have any",
+          "haven't placed",
+          "have not placed",
+          "not placed any",
+          "no order",
+          "0 orders",
+          "zero orders",
+          "not have any orders",
+          "any orders yet",
+          "find any orders",
+          "find any recent orders",
+          "no recent orders",
+          "see any orders",
+          "see any recent orders"
+        ]
+      }
+    ],
+    "must_not_contain": [
+      "ORD-"
+    ],
+    "expected_tool_calls": [
+      {
+        "name": "get_customer",
+        "args": {
+          "email": "maya.patel@example.com"
+        }
+      },
+      {
+        "name": "list_orders",
+        "args": {
+          "customer_id": "C013"
+        }
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

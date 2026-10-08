@@ -1,0 +1,231 @@
+{
+  "case_id": "edge_06_multi_part_question",
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "tool_mode": "native",
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: farid.haddad@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Two things: what's the status of my order ORD-1010, and how long does it take for a refund to show up on my card?"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 6.233,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 951,
+        "completion_tokens": 105,
+        "reasoning_tokens": 78,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The customer is asking about order ORD-1010 status and refund timing. I need to first get the order details to check its status, and also answer the refund timing question. I should use get_order for ORD-1010. Also, I can search the knowledge base for refund timing information. Let me start with getting the order.",
+        "tool_calls": [
+          {
+            "id": "call-46e1095a-984e-48a6-b189-41674e302ce9",
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1010\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1010"
+          },
+          "raw_arguments": "{\"order_id\":\"ORD-1010\"}",
+          "result": "{\"order_id\": \"ORD-1010\", \"customer_id\": \"C006\", \"order_date\": \"2026-09-24\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-PAD-10\", \"name\": \"Mouse Pad\", \"qty\": 1, \"unit_price\": 18.99}], \"total\": 18.99, \"delivered_on\": \"2026-09-28\", \"carrier\": \"USPS\", \"tracking_number\": \"9400111899220000001010\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 19.94,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 1160,
+        "completion_tokens": 114,
+        "reasoning_tokens": 78,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "The user asked two things: status of order ORD-1010, and how long for a refund to show up on card. I have the order details: status is \"delivered\", delivered on 2026-09-28. Now I need to answer the second question about refund timing. I should search the knowledge base for refund processing time. Let me do that.",
+        "tool_calls": [
+          {
+            "id": "call-e7842287-914e-43f3-90b8-2f21b9ff424a",
+            "name": "search_kb",
+            "arguments": "{\"query\":\"refund processing time card\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "search_kb",
+          "arguments": {
+            "query": "refund processing time card"
+          },
+          "raw_arguments": "{\"query\":\"refund processing time card\"}",
+          "result": "{\"query\": \"refund processing time card\", \"results\": [{\"id\": \"KB-001\", \"title\": \"Refund Policy\", \"body\": \"Refunds are available for orders delivered within the last 30 days. Support agents may issue refunds of up to $200.00 per order; any refund above $200.00 must be escalated to a human specialist. Approved refunds are returned to the original payment method and usually arrive within 5-7 business days. Each order can only be refunded once.\"}, {\"id\": \"KB-006\", \"title\": \"Payment Methods\", \"body\": \"We accept Visa, Mastercard, American Express, Discover and PayPal. Gift cards can be combined with one other payment method. We never ask for full card numbers over chat.\"}]}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 7.655,
+      "retries": [
+        {
+          "attempt": 1,
+          "error": "HTTP 500: Error code: 500 - {'error': {'message': 'Internal server error', 'type': 'Internal Server Error', 'code': 500}}",
+          "sleep_s": 1.06
+        }
+      ],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 1387,
+        "completion_tokens": 227,
+        "reasoning_tokens": 92,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "Your order **ORD-1010** is currently **delivered** (it was delivered on **2026-09-28** via USPS, tracking number 9400111899220000001010). The order total was $18.99 for a Mouse Pad.\n\nRegarding refund timing: once a refund is approved and processed, it typically takes **5–7 business days** to appear back on your original payment method (credit/debit card).",
+        "reasoning": "The user asked two things:\n1. Status of order ORD-1010\n2. How long for a refund to show up on their card\n\nI have the order details: ORD-1010 is delivered on 2026-09-28, status \"delivered\". The order total is $18.99, no refunds yet.\n\nFrom the knowledge base, refunds usually arrive within 5-7 business days after approval.\n\nI should provide both answers. Let me respond.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "Your order **ORD-1010** is currently **delivered** (it was delivered on **2026-09-28** via USPS, tracking number 9400111899220000001010). The order total was $18.99 for a Mouse Pad.\n\nRegarding refund timing: once a refund is approved and processed, it typically takes **5–7 business days** to appear back on your original payment method (credit/debit card).",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: farid.haddad@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text."
+    },
+    {
+      "role": "user",
+      "content": "Two things: what's the status of my order ORD-1010, and how long does it take for a refund to show up on my card?"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-46e1095a-984e-48a6-b189-41674e302ce9",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\":\"ORD-1010\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-46e1095a-984e-48a6-b189-41674e302ce9",
+      "content": "{\"order_id\": \"ORD-1010\", \"customer_id\": \"C006\", \"order_date\": \"2026-09-24\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-PAD-10\", \"name\": \"Mouse Pad\", \"qty\": 1, \"unit_price\": 18.99}], \"total\": 18.99, \"delivered_on\": \"2026-09-28\", \"carrier\": \"USPS\", \"tracking_number\": \"9400111899220000001010\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "call-e7842287-914e-43f3-90b8-2f21b9ff424a",
+          "type": "function",
+          "function": {
+            "name": "search_kb",
+            "arguments": "{\"query\":\"refund processing time card\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "call-e7842287-914e-43f3-90b8-2f21b9ff424a",
+      "content": "{\"query\": \"refund processing time card\", \"results\": [{\"id\": \"KB-001\", \"title\": \"Refund Policy\", \"body\": \"Refunds are available for orders delivered within the last 30 days. Support agents may issue refunds of up to $200.00 per order; any refund above $200.00 must be escalated to a human specialist. Approved refunds are returned to the original payment method and usually arrive within 5-7 business days. Each order can only be refunded once.\"}, {\"id\": \"KB-006\", \"title\": \"Payment Methods\", \"body\": \"We accept Visa, Mastercard, American Express, Discover and PayPal. Gift cards can be combined with one other payment method. We never ask for full card numbers over chat.\"}]}"
+    },
+    {
+      "role": "assistant",
+      "content": "Your order **ORD-1010** is currently **delivered** (it was delivered on **2026-09-28** via USPS, tracking number 9400111899220000001010). The order total was $18.99 for a Mouse Pad.\n\nRegarding refund timing: once a refund is approved and processed, it typically takes **5–7 business days** to appear back on your original payment method (credit/debit card)."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": false,
+    "escalations": 0
+  },
+  "usage": {
+    "prompt_tokens": 3498,
+    "completion_tokens": 446,
+    "reasoning_tokens": 248
+  },
+  "llm_latency_s": 33.828,
+  "wall_time_s": 36.435,
+  "retries": 1,
+  "trial": 2,
+  "category": "edge_case",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [
+      "delivered",
+      {
+        "any_of": [
+          "5-7 business days",
+          "5 to 7 business days",
+          "five to seven business days",
+          "5-7 days"
+        ]
+      }
+    ],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1010"
+        }
+      },
+      {
+        "name": "search_kb"
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": false
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}

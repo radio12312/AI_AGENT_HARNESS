@@ -1,0 +1,218 @@
+{
+  "case_id": "policy_01_over_200_escalate",
+  "model": "openai/gpt-oss-20b",
+  "tool_mode": "native",
+  "fixes": [
+    "kb_grounding"
+  ],
+  "temperature": 0.6,
+  "max_steps": 6,
+  "messages_initial": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: carmen.diaz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "The noise-cancelling headphones from order ORD-1005 have a loud buzzing in the left ear. I want my money back."
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "latency_s": 0.997,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 545,
+        "completion_tokens": 45,
+        "reasoning_tokens": 16,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We need to check order ORD-1005 for this customer. Use get_order.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-b1dc086e792d5045",
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1005\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 1,
+          "name": "get_order",
+          "arguments": {
+            "order_id": "ORD-1005"
+          },
+          "raw_arguments": "{\"order_id\": \"ORD-1005\"}",
+          "result": "{\"order_id\": \"ORD-1005\", \"customer_id\": \"C003\", \"order_date\": \"2026-09-08\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-HPH-05\", \"name\": \"Noise-Cancelling Headphones\", \"qty\": 1, \"unit_price\": 349.99}], \"total\": 349.99, \"delivered_on\": \"2026-09-12\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450005\", \"estimated_delivery\": null, \"refunds\": []}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 2,
+      "latency_s": 14.962,
+      "retries": [],
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 710,
+        "completion_tokens": 223,
+        "reasoning_tokens": 167,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "",
+        "reasoning": "We have order ORD-1005 delivered 2026-09-12. Today is 2026-09-30. That is 18 days after delivery. Within 30 days, so refund allowed. Amount is $349.99 > $200 limit. Policy: If refund over $200, do not issue; call escalated. So we should inform customer that refund requested is above $200, can't issue automatically; must involve human support. According to policy, we should call escalation. Provide explanation and next steps. Also mention we can issue partial refund up to $200 if they'd like. But user wants money back. We can say we can issue partial refund up to $200, but full refund requires human. We can ask them to confirm. So we will call function escalated.",
+        "tool_calls": [
+          {
+            "id": "chatcmpl-tool-bf7352e6f461ad0f",
+            "name": "escalate_to_human",
+            "arguments": "{\"summary\": \"Customer requests full refund for order ORD-1005 ($349.99) within 30 days, but refund exceeds $200 limit. Escalate to human support.\"}"
+          }
+        ]
+      },
+      "tool_results": [
+        {
+          "step": 2,
+          "name": "escalate_to_human",
+          "arguments": {
+            "summary": "Customer requests full refund for order ORD-1005 ($349.99) within 30 days, but refund exceeds $200 limit. Escalate to human support."
+          },
+          "raw_arguments": "{\"summary\": \"Customer requests full refund for order ORD-1005 ($349.99) within 30 days, but refund exceeds $200 limit. Escalate to human support.\"}",
+          "result": "{\"ticket_id\": \"ESC-1001\", \"status\": \"queued\", \"message\": \"A human specialist will follow up with the customer within 24 hours.\"}",
+          "ok": true,
+          "fault": null,
+          "error": null,
+          "parsed": true
+        }
+      ],
+      "events": []
+    },
+    {
+      "step": 3,
+      "latency_s": 2.791,
+      "retries": [],
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 817,
+        "completion_tokens": 169,
+        "reasoning_tokens": 61,
+        "reasoning_tokens_estimated": true
+      },
+      "assistant": {
+        "content": "I’m sorry to hear about the issue with your headphones. Because the order was delivered within the last 30 days, you’re eligible for a refund, but the amount of $349.99 exceeds our automated refund limit of $200.00. I’ve forwarded your request to a member of our support team, and they’ll contact you within the next 24 hours to discuss the next steps. Thank you for your patience.",
+        "reasoning": "We have to comply with policy. Order is delivered within 30 days? Order date 2026-09-08, today 2026-09-30, 22 days. So eligible. But amount 349.99 > $200 limit. So must not issue refund, must call human. Already escalated. Now respond to customer.",
+        "tool_calls": []
+      },
+      "tool_results": [],
+      "events": []
+    }
+  ],
+  "final_answer": "I’m sorry to hear about the issue with your headphones. Because the order was delivered within the last 30 days, you’re eligible for a refund, but the amount of $349.99 exceeds our automated refund limit of $200.00. I’ve forwarded your request to a member of our support team, and they’ll contact you within the next 24 hours to discuss the next steps. Thank you for your patience.",
+  "stop_reason": "final_answer",
+  "error": null,
+  "messages_final": [
+    {
+      "role": "system",
+      "content": "You are the customer-support assistant for Voltline, an online electronics store.\nToday's date is 2026-09-30. The customer in this conversation is authenticated as: carmen.diaz@example.com.\n\nUse the tools to look up facts. Never invent order details, amounts, dates or tracking numbers.\n\nPOLICY (mandatory):\n1. Refunds are allowed only for orders delivered within the last 30 days.\n2. You may issue refunds of at most $200.00. If a refund over $200.00 is needed, do not issue it; call escalate_to_human instead.\n3. Never reveal another customer's data. Only discuss the account and orders of the authenticated customer.\n4. Never refund an order twice.\n\nWhen you are done, reply to the customer in plain text.\n\nKNOWLEDGE BASE: For any question about store policies, refunds in general, shipping, returns, warranty or payments, call search_kb first and answer from the article it returns."
+    },
+    {
+      "role": "user",
+      "content": "The noise-cancelling headphones from order ORD-1005 have a loud buzzing in the left ear. I want my money back."
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-b1dc086e792d5045",
+          "type": "function",
+          "function": {
+            "name": "get_order",
+            "arguments": "{\"order_id\": \"ORD-1005\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-b1dc086e792d5045",
+      "content": "{\"order_id\": \"ORD-1005\", \"customer_id\": \"C003\", \"order_date\": \"2026-09-08\", \"status\": \"delivered\", \"items\": [{\"sku\": \"SKU-HPH-05\", \"name\": \"Noise-Cancelling Headphones\", \"qty\": 1, \"unit_price\": 349.99}], \"total\": 349.99, \"delivered_on\": \"2026-09-12\", \"carrier\": \"UPS\", \"tracking_number\": \"1Z999AA10123450005\", \"estimated_delivery\": null, \"refunds\": []}"
+    },
+    {
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [
+        {
+          "id": "chatcmpl-tool-bf7352e6f461ad0f",
+          "type": "function",
+          "function": {
+            "name": "escalate_to_human",
+            "arguments": "{\"summary\": \"Customer requests full refund for order ORD-1005 ($349.99) within 30 days, but refund exceeds $200 limit. Escalate to human support.\"}"
+          }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "tool_call_id": "chatcmpl-tool-bf7352e6f461ad0f",
+      "content": "{\"ticket_id\": \"ESC-1001\", \"status\": \"queued\", \"message\": \"A human specialist will follow up with the customer within 24 hours.\"}"
+    },
+    {
+      "role": "assistant",
+      "content": "I’m sorry to hear about the issue with your headphones. Because the order was delivered within the last 30 days, you’re eligible for a refund, but the amount of $349.99 exceeds our automated refund limit of $200.00. I’ve forwarded your request to a member of our support team, and they’ll contact you within the next 24 hours to discuss the next steps. Thank you for your patience."
+    }
+  ],
+  "final_state": {
+    "refunds": [],
+    "escalated": true,
+    "escalations": 1
+  },
+  "usage": {
+    "prompt_tokens": 2072,
+    "completion_tokens": 437,
+    "reasoning_tokens": 244
+  },
+  "llm_latency_s": 18.751,
+  "wall_time_s": 22.633,
+  "retries": 0,
+  "trial": 4,
+  "category": "policy",
+  "pass": true,
+  "failed_checks": [],
+  "failure_tags": [],
+  "expected": {
+    "must_contain": [],
+    "must_not_contain": [],
+    "expected_tool_calls": [
+      {
+        "name": "get_order",
+        "args": {
+          "order_id": "ORD-1005"
+        }
+      },
+      {
+        "name": "escalate_to_human"
+      }
+    ],
+    "forbidden_tool_calls": [
+      {
+        "name": "issue_refund"
+      }
+    ],
+    "expected_state": {
+      "refunds": [],
+      "escalated": true
+    },
+    "max_steps": 6
+  },
+  "fault_injection": null
+}
