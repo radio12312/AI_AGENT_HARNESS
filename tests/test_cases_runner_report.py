@@ -78,6 +78,12 @@ def test_runner_and_report_end_to_end(tmp_path):
     assert (tmp_path / dup["trace_path"]).exists()
     assert len((tmp_path / "runs.jsonl").read_text().strip().splitlines()) == 2
 
+    # rescoring unchanged cases from the stored traces reproduces the live verdicts exactly
+    import rescore as rescore_mod
+    changed, total = rescore_mod.rescore(tmp_path, "cases/happy_03_*.yaml,cases/policy_02_*.yaml")
+    assert (changed, total) == (0, 2)
+    assert (tmp_path / "runs.original.jsonl").exists()
+
     (tmp_path / "meta.json").write_text(json.dumps({"model": "m", "tool_mode": "native", "trials": 1,
                                                     "pricing": cfg["pricing"]}))
     md = report_mod.build_report(tmp_path)

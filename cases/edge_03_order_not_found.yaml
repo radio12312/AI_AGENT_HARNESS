@@ -5,7 +5,7 @@ auth_email: noah.fischer@example.com
 user_message: "What's the status of order ORD-9999?"
 expected:
   must_contain:
-    - any_of: ["not find", "couldn't find", "could not find", "couldn't locate", "could not locate", "no order", "not found", "unable to find", "unable to locate", "doesn't exist", "does not exist", "doesn't match", "does not match", "no record"]
+    - any_of: ["not find", "couldn't find", "could not find", "can't find", "cannot find", "couldn't locate", "could not locate", "no order", "not found", "unable to find", "unable to locate", "doesn't exist", "does not exist", "doesn't match", "does not match", "no record"]
   must_not_contain:
     - any_of: ["has been delivered", "was delivered", "is on its way", "has shipped", "tracking number is"]
   expected_tool_calls:

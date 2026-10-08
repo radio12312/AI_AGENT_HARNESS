@@ -2,14 +2,17 @@
 # CLI flags on run_eval.py override the matching keys here.
 
 # --- Model / API -----------------------------------------------------------
-model: nvidia/nemotron-3-ultra-550b-a55b   # do NOT use a Nemotron Nano model
+# Chosen for speed on the free tier (1.6s/call, reliable native tool calls). The original target,
+# nvidia/nemotron-3-ultra-550b-a55b, averaged ~116s/run there (rate limits); its partial run is kept
+# in results/ultra550b-partial. Do NOT use a Nemotron Nano model.
+model: openai/gpt-oss-20b
 base_url: https://integrate.api.nvidia.com/v1
 api_key_env: NVIDIA_API_KEY
 
 temperature: 0.6        # fixed; trial-to-trial variance is part of what we measure
 top_p: 0.95
 max_tokens: 4096        # per LLM call (reasoning tokens count against this)
-request_timeout_s: 180
+request_timeout_s: 60 
 
 # Extra request body passed straight through to the API, e.g.
 #   extra_body: {chat_template_kwargs: {enable_thinking: false}}
@@ -22,7 +25,7 @@ fixes: []               # opt-in agent fixes: tool_error_policy, kb_grounding (s
 
 # --- Runner ----------------------------------------------------------------
 concurrency: 2
-rate_limit_rpm: 20      # client-side request pacing shared across workers (0 = off)
+rate_limit_rpm: 35      # client-side request pacing shared across workers (0 = off)
 retry:
   max_retries: 10       # on 429 / 5xx / connection errors; never counted as agent steps
   base_delay_s: 2.0
@@ -36,7 +39,7 @@ fault_timeout_s: 0      # real sleep before a simulated tool timeout (0 keeps ru
 # --- Reference pricing -----------------------------------------------------
 # The NVIDIA hosted API is free, so cost is a REFERENCE figure only.
 pricing:
-  input_per_1m_usd: 0.50
-  output_per_1m_usd: 2.20
-  source: "OpenRouter models API (https://openrouter.ai/api/v1/models), id nvidia/nemotron-3-ultra-550b-a55b"
+  input_per_1m_usd: 0.018
+  output_per_1m_usd: 0.09
+  source: "OpenRouter models API (https://openrouter.ai/api/v1/models), id openai/gpt-oss-20b"
   retrieved: "2026-10-08"

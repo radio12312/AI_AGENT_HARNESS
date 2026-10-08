@@ -6,8 +6,11 @@ steps, tokens and reference cost per *successful* run, and auto-tagged failure m
 
 The agent under test is a small customer-support agent for a fictional electronics store
 ("Voltline"). It runs a manual tool-use loop against deterministic mock tools backed by a JSON
-fixture. The model is `nvidia/nemotron-3-ultra-550b-a55b` served by the NVIDIA API through the
-`openai` Python SDK.
+fixture. The model is served by the NVIDIA API (free tier) through the `openai` Python SDK and is
+set in [config.yaml](config.yaml). The measured model is `openai/gpt-oss-20b`: the original target,
+`nvidia/nemotron-3-ultra-550b-a55b`, worked (91.6% pass, 98/107 runs) but averaged ~116 s per run on
+the free tier because of rate limiting (568 retries, 2 h of backoff), so the full before/after was
+run on the faster model. The partial 550B run is kept in `results/ultra550b-partial/`.
 
 ## Latest results
 
@@ -156,9 +159,10 @@ dates and tracking numbers in the answer that appear in no prompt or tool result
 
 ### Cost
 
-The NVIDIA hosted API is free, so `config.yaml` holds a **reference price**: $0.50 per 1M input
-tokens and $2.20 per 1M output tokens for `nvidia/nemotron-3-ultra-550b-a55b`, taken from the
-OpenRouter models API (`https://openrouter.ai/api/v1/models`) on 2026-10-08. Reports show
+The NVIDIA hosted API is free, so `config.yaml` holds a **reference price** taken from the
+OpenRouter models API (`https://openrouter.ai/api/v1/models`) on 2026-10-08: $0.018 per 1M input
+and $0.09 per 1M output tokens for `openai/gpt-oss-20b` (for comparison,
+`nvidia/nemotron-3-ultra-550b-a55b` was $0.50 / $2.20). Reports show
 **reference cost per successful run = total reference cost / passing runs**, and always the
 provider-independent **tokens per successful run**.
 
